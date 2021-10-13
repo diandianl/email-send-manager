@@ -1,0 +1,15 @@
+name: Customer
+comment: 客户管理
+fields:
+  - name: Name
+    type: string
+    comment: 名称
+    required: true
+    binding_options: ""
+    gorm_options: "size:50;index;"
+  - name: Email
+    type: string
+    comment: 邮箱
+    required: false
+    binding_options: ""
+    gorm_options: "size:100;index;"

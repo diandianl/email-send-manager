@@ -1,0 +1,148 @@
+<template>
+  <div class="dashboard-editor-container">
+    <el-row :gutter="12">
+      <el-col :sm="24" :xs="24" :md="6" :xl="6" :lg="6" :style="{ marginBottom: '12px' }">
+        <chart-card title="总运单" total="528">
+          <el-tooltip slot="action" class="item" effect="dark" content="指标说明" placement="top-start">
+            <i class="el-icon-warning-outline" />
+          </el-tooltip>
+        </chart-card>
+      </el-col>
+      <el-col :sm="24" :xs="24" :md="6" :xl="6" :lg="6" :style="{ marginBottom: '12px' }">
+        <chart-card title="草稿运单" total="43">
+          <el-tooltip slot="action" class="item" effect="dark" content="指标说明" placement="top-start">
+            <i class="el-icon-warning-outline" />
+          </el-tooltip>
+        </chart-card>
+      </el-col>
+      <el-col :sm="24" :xs="24" :md="6" :xl="6" :lg="6" :style="{ marginBottom: '12px' }">
+        <chart-card title="预报运单" total="347">
+          <el-tooltip slot="action" class="item" effect="dark" content="指标说明" placement="top-start">
+            <i class="el-icon-warning-outline" />
+          </el-tooltip>
+        </chart-card>
+      </el-col>
+      <el-col :sm="24" :xs="24" :md="6" :xl="6" :lg="6" :style="{ marginBottom: '12px' }">
+        <chart-card title="问题运单" total="8">
+          <el-tooltip slot="action" class="item" effect="dark" content="指标说明" placement="top-start">
+            <i class="el-icon-warning-outline" />
+          </el-tooltip>
+        </chart-card>
+      </el-col>
+    </el-row>
+
+    <el-card :bordered="false" :body-style="{padding: '0'}">
+      <div class="salesCard">
+        <el-tabs>
+          <el-tab-pane label="销售额">
+            <el-row>
+              <el-col :xl="16" :lg="12" :md="12" :sm="24" :xs="24">
+                <bar :list="barData" title="销售额排行" />
+              </el-col>
+              <el-col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">
+                <rank-list title="门店销售排行榜" :list="rankList" />
+              </el-col>
+            </el-row>
+          </el-tab-pane>
+          <el-tab-pane label="访问量">
+            <el-row>
+              <el-col :xl="16" :lg="12" :md="12" :sm="24" :xs="24">
+                <bar :list="barData2" title="销售额趋势" />
+              </el-col>
+              <el-col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">
+                <rank-list title="门店销售排行榜" :list="rankList" />
+              </el-col>
+            </el-row>
+          </el-tab-pane>
+        </el-tabs>
+      </div>
+    </el-card>
+
+  </div>
+</template>
+
+<script>
+import ChartCard from '@/components/ChartCard'
+import Trend from '@/components/Trend'
+import MiniArea from '@/components/MiniArea'
+import MiniBar from '@/components/MiniBar'
+import MiniProgress from '@/components/MiniProgress'
+import RankList from '@/components/RankList/index'
+import Bar from '@/components/Bar.vue'
+
+const barData = []
+const barData2 = []
+for (let i = 0; i < 12; i += 1) {
+  barData.push({
+    x: `${i + 1}月`,
+    y: Math.floor(Math.random() * 1000) + 200
+  })
+  barData2.push({
+    x: `${i + 1}月`,
+    y: Math.floor(Math.random() * 1000) + 200
+  })
+}
+
+const rankList = []
+for (let i = 0; i < 7; i++) {
+  rankList.push({
+    name: '白鹭岛 ' + (i + 1) + ' 号店',
+    total: 1234.56 - i * 100
+  })
+}
+
+export default {
+  name: 'DashboardAdmin',
+  components: {
+    ChartCard,
+    Trend,
+    MiniArea,
+    MiniBar,
+    MiniProgress,
+    RankList,
+    Bar
+  },
+  data() {
+    return {
+      barData,
+      barData2,
+      rankList
+    }
+  },
+  methods: {
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.dashboard-editor-container {
+  padding: 12px;
+  background-color: rgb(240, 242, 245);
+  position: relative;
+
+  .github-corner {
+    position: absolute;
+    top: 0;
+    border: 0;
+    right: 0;
+  }
+
+  .chart-wrapper {
+    background: #fff;
+    padding: 16px 16px 0;
+    margin-bottom: 32px;
+  }
+}
+
+::v-deep .el-tabs__item{
+   padding-left: 16px!important;
+   height: 50px;
+   line-height: 50px;
+}
+
+@media (max-width:1024px) {
+  .chart-wrapper {
+    padding: 8px;
+  }
+}
+</style>

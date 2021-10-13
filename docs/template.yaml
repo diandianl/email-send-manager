@@ -1,0 +1,40 @@
+name: Template
+comment: 邮件模板管理
+fields:
+  - name: Name
+    type: string
+    comment: 名称
+    required: true
+    binding_options: ""
+    gorm_options: "size:100;index;"
+  - name: From
+    type: string
+    comment: 发件人邮箱
+    required: true
+    binding_options: ""
+    gorm_options: "size:100;"
+  - name: FromName
+    type: string
+    comment: 联系人名称
+    required: false
+    binding_options: ""
+    gorm_options: "size:100;"
+  - name: ReplyTo
+    type: string
+    comment: 回复邮箱地址
+    required: false
+    binding_options: ""
+    gorm_options: "size:100;"
+  - name: Subject
+    type: string
+    comment: 邮件主题
+    required: true
+    binding_options: ""
+    gorm_options: "size:100;"
+  - name: Content
+    type: string
+    comment: 邮件正文模板
+    required: true
+    binding_options: ""
+    gorm_options: "size:100;"
+

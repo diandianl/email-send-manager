@@ -1,0 +1,47 @@
+# 运行模式(debug:调试,test:测试,release:正式)
+RunMode = "debug"
+
+# 静态站点目录(也可以启动服务时使用-www指定)
+WWW = ""
+
+[HTTP]
+# http监听地址
+Host = "0.0.0.0"
+# http监听端口
+Port = 10099
+# http优雅关闭等待超时时长(单位秒)
+ShutdownTimeout = 30
+# 允许的最大内容长度(64M)
+MaxContentLength = 67108864
+# 允许输出的最大请求日志长度
+MaxReqLoggerLength = 1024
+
+[Log]
+# 日志级别(1:fatal 2:error,3:warn,4:info,5:debug,6:trace)
+Level = 5
+# 日志格式（支持输出格式：text | json）
+Format = "text"
+# 日志输出(支持：stdout | stderr | file)
+Output = "stdout"
+# 指定日志输出的文件路径
+OutputFile = "data/email-send-manager.log"
+
+[Gorm]
+# 是否开启调试模式
+Debug = true
+# 数据库类型(目前支持的数据库类型：sqlite3)
+DBType = "sqlite3"
+# 设置连接可以重用的最长时间(单位：秒)
+MaxLifetime = 7200
+# 设置数据库的最大打开连接数
+MaxOpenConns = 150
+# 设置空闲连接池中的最大连接数
+MaxIdleConns = 50
+# 数据库表名前缀
+TablePrefix = "tb_"
+# 是否启用自动映射数据库表结构
+EnableAutoMigrate = true
+
+[Sqlite3]
+# 数据库路径
+Path = "data/email-send-manager.db"

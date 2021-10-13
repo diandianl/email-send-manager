@@ -1,0 +1,13 @@
+name: SendBatch
+comment: 邮件发送批次
+fields:
+  - name: TemplateID
+    type: uint64
+    comment: 模板ID
+    required: true
+  - name: ReverseSelection
+    type: bool
+    comment: 是否是反选客户
+  - name: CustomerIDs
+    type: "[]uint64"
+    comment: 客户列表

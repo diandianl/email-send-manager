@@ -1,0 +1,15 @@
+name: Record
+comment: 邮件发送记录
+fields:
+  - name: TemplateID
+    type: uint64
+    comment: 模板ID
+  - name: CustomerID
+    type: uint64
+    comment: 客户ID
+  - name: Status
+    type: int
+    comment: 结果状态
+  - name: Reason
+    type: string
+    comment: 失败原因
