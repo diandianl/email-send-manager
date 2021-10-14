@@ -53,7 +53,7 @@ func (a *RecordRepo) Query(ctx context.Context, params schema.RecordQueryParam, 
 	return qr, nil
 }
 
-func (a *RecordRepo) Get(ctx context.Context, id uint64, opts ...schema.RecordQueryOptions) (*schema.Record, error) {
+func (a *RecordRepo) Get(ctx context.Context, id uint, opts ...schema.RecordQueryOptions) (*schema.Record, error) {
 	var item Record
 	ok, err := util.FindOne(ctx, GetRecordDB(ctx, a.DB).Where("id=?", id), &item)
 	if err != nil {
@@ -71,18 +71,18 @@ func (a *RecordRepo) Create(ctx context.Context, item schema.Record) error {
 	return errors.WithStack(result.Error)
 }
 
-func (a *RecordRepo) Update(ctx context.Context, id uint64, item schema.Record) error {
+func (a *RecordRepo) Update(ctx context.Context, id uint, item schema.Record) error {
 	eitem := SchemaRecord(item).ToRecord()
 	result := GetRecordDB(ctx, a.DB).Where("id=?", id).Updates(eitem)
 	return errors.WithStack(result.Error)
 }
 
-func (a *RecordRepo) Delete(ctx context.Context, id uint64) error {
+func (a *RecordRepo) Delete(ctx context.Context, id uint) error {
 	result := GetRecordDB(ctx, a.DB).Where("id=?", id).Delete(Record{})
 	return errors.WithStack(result.Error)
 }
 
-func (a *RecordRepo) UpdateStatus(ctx context.Context, id uint64, status int) error {
+func (a *RecordRepo) UpdateStatus(ctx context.Context, id uint, status int) error {
 	result := GetRecordDB(ctx, a.DB).Where("id=?", id).Update("status", status)
 	return errors.WithStack(result.Error)
 }

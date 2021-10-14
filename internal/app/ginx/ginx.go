@@ -21,13 +21,13 @@ const (
 )
 
 // ParseParamID Parse path id
-func ParseParamID(c *gin.Context, key string) uint64 {
+func ParseParamID(c *gin.Context, key string) uint {
 	val := c.Param(key)
-	id, err := strconv.ParseUint(val, 10, 64)
+	id, err := strconv.ParseUint(val, 10, 32)
 	if err != nil {
 		return 0
 	}
-	return id
+	return uint(id)
 }
 
 // ParseJSON 解析请求JSON

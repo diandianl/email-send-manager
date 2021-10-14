@@ -4,7 +4,7 @@ import "time"
 
 // Template 邮件模板管理对象
 type Template struct {
-	ID        uint64    `json:"id"`                         // 唯一标识
+	ID        uint    `json:"id"`                         // 唯一标识
 	Name      string    `json:"name" binding:"required"`    // 名称
 	From      string    `json:"from" binding:"required"`    // 发件人邮箱
 	FromName  string    `json:"from_name"`                  // 联系人名称

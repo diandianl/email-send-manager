@@ -1,4 +1,5 @@
 'use strict'
+const webpack = require('webpack')
 const path = require('path')
 const CompressionPlugin = require('compression-webpack-plugin')// 引入gzip压缩插件
 const defaultSettings = require('./src/settings.js')
@@ -28,7 +29,7 @@ module.exports = {
    * Detail: https://cli.vuejs.org/config/#publicpath
    */
   publicPath: '/',
-  outputDir: 'site',
+  outputDir: 'dist',
   // assetsDir: '../../static/admin',
   // assetsDir: '/',
   lintOnSave: process.env.NODE_ENV === 'development',
@@ -39,10 +40,20 @@ module.exports = {
     overlay: {
       warnings: false,
       errors: true
+    },
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:10099',
+        changeOrigin: true
+      }
     }
   },
   configureWebpack: {
     plugins: [
+      new webpack.ProvidePlugin({
+        'window.Quill': 'quill/dist/quill.js',
+        'Quill': 'quill/dist/quill.js'
+      }),
       new CompressionPlugin({
         algorithm: 'gzip',
         test: /\.js$|\.html$|\.css/, // 匹配文件名

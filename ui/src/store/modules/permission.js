@@ -1,5 +1,4 @@
 import { asyncRoutes, constantRoutes } from '@/router'
-import { getRoutes } from '@/api/admin/sys-role'
 import Layout from '@/layout'
 // import sysuserindex from '@/views/sysuser/index'
 
@@ -130,36 +129,13 @@ const mutations = {
 }
 
 const actions = {
-  generateRoutes({ commit }, roles) {
-    return new Promise(resolve => {
-      const loadMenuData = []
-
-      getRoutes().then(response => {
-        // console.log(JSON.stringify(response))
-        let data = response
-        if (response.code !== 200) {
-          this.$message({
-            message: '菜单数据加载异常',
-            type: 0
-          })
-        } else {
-          data = response.data
-          Object.assign(loadMenuData, data)
-
-          generaMenu(asyncRoutes, loadMenuData)
-          asyncRoutes.push({ path: '*', redirect: '/', hidden: true })
-          commit('SET_ROUTES', asyncRoutes)
-          const sidebarRoutes = []
-          generaMenu(sidebarRoutes, loadMenuData)
-          commit('SET_SIDEBAR_ROUTERS', constantRoutes.concat(sidebarRoutes))
-          commit('SET_DEFAULT_ROUTES', sidebarRoutes)
-          commit('SET_TOPBAR_ROUTES', sidebarRoutes)
-          resolve(asyncRoutes)
-        }
-      }).catch(error => {
-        console.log(error)
-      })
-    })
+  generateRoutes({ commit }) {
+    asyncRoutes.push({ path: '*', redirect: '/', hidden: true })
+    commit('SET_ROUTES', asyncRoutes)
+    const sidebarRoutes = []
+    commit('SET_SIDEBAR_ROUTERS', constantRoutes)
+    commit('SET_DEFAULT_ROUTES', sidebarRoutes)
+    commit('SET_TOPBAR_ROUTES', sidebarRoutes)
   }
 }
 

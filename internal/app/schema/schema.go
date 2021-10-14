@@ -117,7 +117,7 @@ type OrderField struct {
 }
 
 // NewIDResult 创建响应唯一标识实例
-func NewIDResult(id uint64) *IDResult {
+func NewIDResult(id uint) *IDResult {
 	return &IDResult{
 		ID: id,
 	}
@@ -125,5 +125,5 @@ func NewIDResult(id uint64) *IDResult {
 
 // IDResult 响应唯一标识
 type IDResult struct {
-	ID uint64 `json:"id"`
+	ID uint `json:"id"`
 }

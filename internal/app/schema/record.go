@@ -4,9 +4,9 @@ import "time"
 
 // Record 邮件发送记录对象
 type Record struct {
-	ID         uint64    `json:"id"`          // 唯一标识
-	TemplateID uint64    `json:"template_id"` // 模板ID
-	CustomerID uint64    `json:"customer_id"` // 客户ID
+	ID         uint    `json:"id"`          // 唯一标识
+	TemplateID uint    `json:"template_id"` // 模板ID
+	CustomerID uint    `json:"customer_id"` // 客户ID
 	Status     int       `json:"status"`      // 结果状态(0:成功 1:失败)
 	Reason     string    `json:"reason"`      // 失败原因
 	CreatedAt  time.Time `json:"created_at"`  // 创建时间

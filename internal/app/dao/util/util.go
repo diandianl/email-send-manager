@@ -15,7 +15,7 @@ import (
 
 // Model Define basic
 type Model struct {
-	ID        uint64 `gorm:"primaryKey;"`
+	ID        uint `gorm:"primaryKey;"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

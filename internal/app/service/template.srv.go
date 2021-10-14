@@ -8,7 +8,6 @@ import (
 	"email-send-manager/internal/app/dao"
 	"email-send-manager/internal/app/schema"
 	"email-send-manager/pkg/errors"
-	"email-send-manager/pkg/util/snowflake"
 )
 
 var TemplateSet = wire.NewSet(wire.Struct(new(TemplateSrv), "*"))
@@ -26,7 +25,7 @@ func (a *TemplateSrv) Query(ctx context.Context, params schema.TemplateQueryPara
 	return result, nil
 }
 
-func (a *TemplateSrv) Get(ctx context.Context, id uint64, opts ...schema.TemplateQueryOptions) (*schema.Template, error) {
+func (a *TemplateSrv) Get(ctx context.Context, id uint, opts ...schema.TemplateQueryOptions) (*schema.Template, error) {
 	item, err := a.TemplateRepo.Get(ctx, id, opts...)
 	if err != nil {
 		return nil, err
@@ -38,7 +37,6 @@ func (a *TemplateSrv) Get(ctx context.Context, id uint64, opts ...schema.Templat
 }
 
 func (a *TemplateSrv) Create(ctx context.Context, item schema.Template) (*schema.IDResult, error) {
-	item.ID = snowflake.MustID()
 
 	err := a.TransRepo.Exec(ctx, func(ctx context.Context) error {
 		return a.TemplateRepo.Create(ctx, item)
@@ -50,7 +48,7 @@ func (a *TemplateSrv) Create(ctx context.Context, item schema.Template) (*schema
 	return schema.NewIDResult(item.ID), nil
 }
 
-func (a *TemplateSrv) Update(ctx context.Context, id uint64, item schema.Template) error {
+func (a *TemplateSrv) Update(ctx context.Context, id uint, item schema.Template) error {
 	oldItem, err := a.Get(ctx, id)
 	if err != nil {
 		return err
@@ -66,7 +64,7 @@ func (a *TemplateSrv) Update(ctx context.Context, id uint64, item schema.Templat
 	})
 }
 
-func (a *TemplateSrv) Delete(ctx context.Context, id uint64) error {
+func (a *TemplateSrv) Delete(ctx context.Context, id uint) error {
 	oldItem, err := a.TemplateRepo.Get(ctx, id)
 	if err != nil {
 		return err
@@ -79,7 +77,7 @@ func (a *TemplateSrv) Delete(ctx context.Context, id uint64) error {
 	})
 }
 
-func (a *TemplateSrv) UpdateStatus(ctx context.Context, id uint64, status int) error {
+func (a *TemplateSrv) UpdateStatus(ctx context.Context, id uint, status int) error {
 	oldItem, err := a.TemplateRepo.Get(ctx, id)
 	if err != nil {
 		return err

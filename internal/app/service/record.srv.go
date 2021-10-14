@@ -8,7 +8,6 @@ import (
 	"email-send-manager/internal/app/dao"
 	"email-send-manager/internal/app/schema"
 	"email-send-manager/pkg/errors"
-	"email-send-manager/pkg/util/snowflake"
 )
 
 var RecordSet = wire.NewSet(wire.Struct(new(RecordSrv), "*"))
@@ -26,7 +25,7 @@ func (a *RecordSrv) Query(ctx context.Context, params schema.RecordQueryParam, o
 	return result, nil
 }
 
-func (a *RecordSrv) Get(ctx context.Context, id uint64, opts ...schema.RecordQueryOptions) (*schema.Record, error) {
+func (a *RecordSrv) Get(ctx context.Context, id uint, opts ...schema.RecordQueryOptions) (*schema.Record, error) {
 	item, err := a.RecordRepo.Get(ctx, id, opts...)
 	if err != nil {
 		return nil, err
@@ -38,7 +37,6 @@ func (a *RecordSrv) Get(ctx context.Context, id uint64, opts ...schema.RecordQue
 }
 
 func (a *RecordSrv) Create(ctx context.Context, item schema.Record) (*schema.IDResult, error) {
-	item.ID = snowflake.MustID()
 
 	err := a.TransRepo.Exec(ctx, func(ctx context.Context) error {
 		return a.RecordRepo.Create(ctx, item)
@@ -50,7 +48,7 @@ func (a *RecordSrv) Create(ctx context.Context, item schema.Record) (*schema.IDR
 	return schema.NewIDResult(item.ID), nil
 }
 
-func (a *RecordSrv) Update(ctx context.Context, id uint64, item schema.Record) error {
+func (a *RecordSrv) Update(ctx context.Context, id uint, item schema.Record) error {
 	oldItem, err := a.Get(ctx, id)
 	if err != nil {
 		return err
@@ -66,7 +64,7 @@ func (a *RecordSrv) Update(ctx context.Context, id uint64, item schema.Record) e
 	})
 }
 
-func (a *RecordSrv) Delete(ctx context.Context, id uint64) error {
+func (a *RecordSrv) Delete(ctx context.Context, id uint) error {
 	oldItem, err := a.RecordRepo.Get(ctx, id)
 	if err != nil {
 		return err
@@ -79,7 +77,7 @@ func (a *RecordSrv) Delete(ctx context.Context, id uint64) error {
 	})
 }
 
-func (a *RecordSrv) UpdateStatus(ctx context.Context, id uint64, status int) error {
+func (a *RecordSrv) UpdateStatus(ctx context.Context, id uint, status int) error {
 	oldItem, err := a.RecordRepo.Get(ctx, id)
 	if err != nil {
 		return err

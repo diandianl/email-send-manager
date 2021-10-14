@@ -1,5 +1,5 @@
 module.exports = {
-  title: 'kobh后台管理系统',
+  title: '邮件群发管理系统',
 
   /**
    * @type {boolean} true | false
@@ -10,7 +10,7 @@ module.exports = {
   /**
    * 是否显示顶部导航
    */
-  topNav: true,
+  topNav: false,
 
   /**
    * @type {boolean} true | false

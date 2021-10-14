@@ -66,6 +66,8 @@
     "normalize.css": "8.0.1",
     "nprogress": "0.2.0",
     "path-to-regexp": "6.1.0",
+    "quill-image-drop-module": "^1.0.3",
+    "quill-image-resize-module": "^3.0.0",
     "remixicon": "^2.5.0",
     "sass-resources-loader": "^2.0.3",
     "screenfull": "5.0.2",

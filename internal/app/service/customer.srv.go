@@ -11,7 +11,6 @@ import (
 	"email-send-manager/internal/app/dao"
 	"email-send-manager/internal/app/schema"
 	"email-send-manager/pkg/errors"
-	"email-send-manager/pkg/util/snowflake"
 )
 
 var CustomerSet = wire.NewSet(wire.Struct(new(CustomerSrv), "*"))
@@ -29,7 +28,7 @@ func (a *CustomerSrv) Query(ctx context.Context, params schema.CustomerQueryPara
 	return result, nil
 }
 
-func (a *CustomerSrv) Get(ctx context.Context, id uint64, opts ...schema.CustomerQueryOptions) (*schema.Customer, error) {
+func (a *CustomerSrv) Get(ctx context.Context, id uint, opts ...schema.CustomerQueryOptions) (*schema.Customer, error) {
 	item, err := a.CustomerRepo.Get(ctx, id, opts...)
 	if err != nil {
 		return nil, err
@@ -41,7 +40,6 @@ func (a *CustomerSrv) Get(ctx context.Context, id uint64, opts ...schema.Custome
 }
 
 func (a *CustomerSrv) Create(ctx context.Context, item schema.Customer) (*schema.IDResult, error) {
-	item.ID = snowflake.MustID()
 
 	err := a.TransRepo.Exec(ctx, func(ctx context.Context) error {
 		return a.CustomerRepo.Create(ctx, item)
@@ -53,7 +51,7 @@ func (a *CustomerSrv) Create(ctx context.Context, item schema.Customer) (*schema
 	return schema.NewIDResult(item.ID), nil
 }
 
-func (a *CustomerSrv) Update(ctx context.Context, id uint64, item schema.Customer) error {
+func (a *CustomerSrv) Update(ctx context.Context, id uint, item schema.Customer) error {
 	oldItem, err := a.Get(ctx, id)
 	if err != nil {
 		return err
@@ -69,7 +67,7 @@ func (a *CustomerSrv) Update(ctx context.Context, id uint64, item schema.Custome
 	})
 }
 
-func (a *CustomerSrv) Delete(ctx context.Context, id uint64) error {
+func (a *CustomerSrv) Delete(ctx context.Context, id uint) error {
 	oldItem, err := a.CustomerRepo.Get(ctx, id)
 	if err != nil {
 		return err
@@ -82,7 +80,7 @@ func (a *CustomerSrv) Delete(ctx context.Context, id uint64) error {
 	})
 }
 
-func (a *CustomerSrv) UpdateStatus(ctx context.Context, id uint64, status int) error {
+func (a *CustomerSrv) UpdateStatus(ctx context.Context, id uint, status int) error {
 	oldItem, err := a.CustomerRepo.Get(ctx, id)
 	if err != nil {
 		return err

@@ -33,7 +33,7 @@ type Template struct {
 	FromName string `gorm:"size:100;"`                     // 联系人名称
 	ReplyTo  string `gorm:"size:100;"`                     // 回复邮箱地址
 	Subject  string `gorm:"size:100;"`                     // 邮件主题
-	Content  string `gorm:"size:100;"`                     // 邮件正文模板
+	Content  string `gorm:""`                              // 邮件正文模板
 	Status   int    `gorm:"type:tinyint;index;default:1;"` // 状态(1:启用 0:停用)
 }
 

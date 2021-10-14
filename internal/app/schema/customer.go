@@ -4,7 +4,7 @@ import "time"
 
 // Customer 客户管理对象
 type Customer struct {
-	ID        uint64    `json:"id"`                      // 唯一标识
+	ID        uint    `json:"id"`                      // 唯一标识
 	Name      string    `json:"name" binding:"required"` // 名称
 	Email     string    `json:"email"`                   // 邮箱
 	Status    int       `json:"status"`                  // 状态(1:启用 2:禁用)

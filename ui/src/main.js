@@ -25,7 +25,7 @@ import { getConfigKey } from '@/api/admin/sys-config'
 import { parseTime, resetForm, addDateRange, selectDictLabel, /* download,*/ selectItemsLabel } from '@/utils/costum'
 
 import './icons' // icon
-import './permission' // permission control
+// import './permission' // permission control
 import './utils/error-log' // error log
 
 import Viser from 'viser-vue'
@@ -80,14 +80,15 @@ Vue.use(VueDND)
 
 import 'remixicon/fonts/remixicon.css'
 
-console.info(`欢迎使用kobh`)
-
 // register global utility filters
 Object.keys(filters).forEach(key => {
   Vue.filter(key, filters[key])
 })
 
 Vue.config.productionTip = false
+
+store.dispatch('system/settingDetail')
+store.dispatch('permission/generateRoutes')
 
 new Vue({
   el: '#app',

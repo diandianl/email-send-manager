@@ -53,7 +53,7 @@ func (a *TemplateRepo) Query(ctx context.Context, params schema.TemplateQueryPar
 	return qr, nil
 }
 
-func (a *TemplateRepo) Get(ctx context.Context, id uint64, opts ...schema.TemplateQueryOptions) (*schema.Template, error) {
+func (a *TemplateRepo) Get(ctx context.Context, id uint, opts ...schema.TemplateQueryOptions) (*schema.Template, error) {
 	var item Template
 	ok, err := util.FindOne(ctx, GetTemplateDB(ctx, a.DB).Where("id=?", id), &item)
 	if err != nil {
@@ -71,18 +71,18 @@ func (a *TemplateRepo) Create(ctx context.Context, item schema.Template) error {
 	return errors.WithStack(result.Error)
 }
 
-func (a *TemplateRepo) Update(ctx context.Context, id uint64, item schema.Template) error {
+func (a *TemplateRepo) Update(ctx context.Context, id uint, item schema.Template) error {
 	eitem := SchemaTemplate(item).ToTemplate()
 	result := GetTemplateDB(ctx, a.DB).Where("id=?", id).Updates(eitem)
 	return errors.WithStack(result.Error)
 }
 
-func (a *TemplateRepo) Delete(ctx context.Context, id uint64) error {
+func (a *TemplateRepo) Delete(ctx context.Context, id uint) error {
 	result := GetTemplateDB(ctx, a.DB).Where("id=?", id).Delete(Template{})
 	return errors.WithStack(result.Error)
 }
 
-func (a *TemplateRepo) UpdateStatus(ctx context.Context, id uint64, status int) error {
+func (a *TemplateRepo) UpdateStatus(ctx context.Context, id uint, status int) error {
 	result := GetTemplateDB(ctx, a.DB).Where("id=?", id).Update("status", status)
 	return errors.WithStack(result.Error)
 }

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { MessageBox, Message } from 'element-ui'
+import { Message } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
 
@@ -44,39 +44,9 @@ service.interceptors.response.use(
    * You can also judge the status by HTTP Status Code
    */
   response => {
-    const code = response.data.code
-    if (code === 401) {
-      store.dispatch('user/resetToken')
-      if (location.href.indexOf('login') !== -1) {
-        location.reload() // 为了重新实例化vue-router对象 避免bug
-      } else {
-        MessageBox.confirm(
-          '登录状态已过期，您可以继续留在该页面，或者重新登录',
-          '系统提示',
-          {
-            confirmButtonText: '重新登录',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }
-        ).then(() => {
-          location.reload() // 为了重新实例化vue-router对象 避免bug
-        })
-      }
-    } else if (code === 6401) {
-      store.dispatch('user/resetToken')
-      MessageBox.confirm(
-        '登录状态已过期，您可以继续留在该页面，或者重新登录',
-        '系统提示',
-        {
-          confirmButtonText: '重新登录',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }
-      ).then(() => {
-        location.reload() // 为了重新实例化vue-router对象 避免bug
-      })
-      return false
-    } else if (code === 400 || code === 403) {
+    if (response.status === 200) {
+      return response
+    } else {
       Message({
         showClose: true,
         message: response.data.msg,
@@ -84,15 +54,6 @@ service.interceptors.response.use(
         duration: 5 * 1000
       })
       return Promise.reject(response)
-    } else if (code !== 200) {
-      Message({
-        message: response.data.msg,
-        type: 'error',
-        duration: 3 * 1000
-      })
-      return Promise.reject(response)
-    } else {
-      return response.data
     }
   },
   error => {

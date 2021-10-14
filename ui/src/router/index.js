@@ -84,6 +84,32 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/customer',
+    component: Layout,
+    redirect: '/customer/index',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/customer/index'),
+        name: 'CustomerIndex',
+        meta: { title: '客户管理', icon: 'user', noCache: true }
+      }
+    ]
+  },
+  {
+    path: '/template',
+    component: Layout,
+    redirect: '/template/index',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/template/index'),
+        name: 'TemplateIndex',
+        meta: { title: '模板管理', icon: 'email', noCache: true }
+      }
+    ]
+  },
+  {
     path: '/profile',
     component: Layout,
     redirect: '/profile/index',

@@ -54,7 +54,7 @@ func (a *CustomerRepo) Query(ctx context.Context, params schema.CustomerQueryPar
 	return qr, nil
 }
 
-func (a *CustomerRepo) Get(ctx context.Context, id uint64, opts ...schema.CustomerQueryOptions) (*schema.Customer, error) {
+func (a *CustomerRepo) Get(ctx context.Context, id uint, opts ...schema.CustomerQueryOptions) (*schema.Customer, error) {
 	var item Customer
 	ok, err := util.FindOne(ctx, GetCustomerDB(ctx, a.DB).Where("id=?", id), &item)
 	if err != nil {
@@ -72,18 +72,18 @@ func (a *CustomerRepo) Create(ctx context.Context, item schema.Customer) error {
 	return errors.WithStack(result.Error)
 }
 
-func (a *CustomerRepo) Update(ctx context.Context, id uint64, item schema.Customer) error {
+func (a *CustomerRepo) Update(ctx context.Context, id uint, item schema.Customer) error {
 	eitem := SchemaCustomer(item).ToCustomer()
 	result := GetCustomerDB(ctx, a.DB).Where("id=?", id).Updates(eitem)
 	return errors.WithStack(result.Error)
 }
 
-func (a *CustomerRepo) Delete(ctx context.Context, id uint64) error {
+func (a *CustomerRepo) Delete(ctx context.Context, id uint) error {
 	result := GetCustomerDB(ctx, a.DB).Where("id=?", id).Delete(Customer{})
 	return errors.WithStack(result.Error)
 }
 
-func (a *CustomerRepo) UpdateStatus(ctx context.Context, id uint64, status int) error {
+func (a *CustomerRepo) UpdateStatus(ctx context.Context, id uint, status int) error {
 	result := GetCustomerDB(ctx, a.DB).Where("id=?", id).Update("status", status)
 	return errors.WithStack(result.Error)
 }
