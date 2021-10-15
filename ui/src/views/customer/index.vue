@@ -22,7 +22,7 @@
             />
           </el-form-item>
           <el-form-item label="状态" prop="status">
-            <el-select v-model="queryParams.status" placeholder="岗位状态" clearable size="small">
+            <el-select v-model="queryParams.status" placeholder="客户状态" clearable size="small">
               <el-option
                 v-for="o in statusOptions"
                 :key="o.value"

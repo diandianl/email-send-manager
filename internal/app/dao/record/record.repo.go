@@ -39,6 +39,12 @@ func (a *RecordRepo) Query(ctx context.Context, params schema.RecordQueryParam, 
 	opt.OrderFields = append(opt.OrderFields, schema.NewOrderField("id", schema.OrderByDESC))
 	db = db.Order(util.ParseOrder(opt.OrderFields))
 
+	db = db.Preload("Template", func(db *gorm.DB) *gorm.DB {
+		return db.Select("id", "name")
+	}).Preload("Customer", func(db *gorm.DB) *gorm.DB {
+		return db.Select("id", "email")
+	})
+
 	var list Records
 	pr, err := util.WrapPageQuery(ctx, db, params.PaginationParam, &list)
 	if err != nil {

@@ -2,6 +2,8 @@ package record
 
 import (
 	"context"
+	"email-send-manager/internal/app/dao/customer"
+	"email-send-manager/internal/app/dao/template"
 
 	"gorm.io/gorm"
 
@@ -29,7 +31,9 @@ func (a SchemaRecord) ToRecord() *Record {
 type Record struct {
 	util.Model
 	TemplateID uint64 `gorm:""`                              // 模板ID
+	Template   *template.Template
 	CustomerID uint64 `gorm:""`                              // 客户ID
+	Customer   *customer.Customer
 	Status     int    `gorm:"type:tinyint;index;default:0;"` // 状态(0:成功 1:失败)
 	Reason     string `gorm:""`                              // 失败原因
 }

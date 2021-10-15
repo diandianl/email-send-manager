@@ -10,4 +10,5 @@ var ServiceSet = wire.NewSet(
 	TemplateSet,
 	RecordSet,
 	SendBatchSet,
+	SettingSet,
 ) // end

@@ -9,6 +9,7 @@ import (
 	"email-send-manager/internal/app/api"
 	"email-send-manager/internal/app/dao/customer"
 	"email-send-manager/internal/app/dao/record"
+	"email-send-manager/internal/app/dao/setting"
 	"email-send-manager/internal/app/dao/template"
 	"email-send-manager/internal/app/dao/util"
 	"email-send-manager/internal/app/router"
@@ -56,10 +57,30 @@ func BuildInjector() (*Injector, func(), error) {
 	recordAPI := &api.RecordAPI{
 		RecordSrv: recordSrv,
 	}
+	sendBatchSrv := &service.SendBatchSrv{
+		TransRepo:    trans,
+		CustomerRepo: customerRepo,
+		TemplateRepo: templateRepo,
+	}
+	sendBatchAPI := &api.SendBatchAPI{
+		SendBatchSrv: sendBatchSrv,
+	}
+	settingRepo := &setting.SettingRepo{
+		DB: db,
+	}
+	settingSrv := &service.SettingSrv{
+		TransRepo:   trans,
+		SettingRepo: settingRepo,
+	}
+	settingAPI := &api.SettingAPI{
+		SettingSrv: settingSrv,
+	}
 	routerRouter := &router.Router{
-		CustomerAPI: customerAPI,
-		TemplateAPI: templateAPI,
-		RecordAPI:   recordAPI,
+		CustomerAPI:  customerAPI,
+		TemplateAPI:  templateAPI,
+		RecordAPI:    recordAPI,
+		SendBatchAPI: sendBatchAPI,
+		SettingAPI:   settingAPI,
 	}
 	engine := InitGinEngine(routerRouter)
 	injector := &Injector{

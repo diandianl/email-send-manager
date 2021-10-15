@@ -23,8 +23,14 @@ func (a *TemplateAPI) Query(c *gin.Context) {
 		return
 	}
 
-	params.Pagination = true
-	result, err := a.TemplateSrv.Query(ctx, params)
+	if params.PageSize != -1 {
+		params.Pagination = true
+	}
+	var opts []schema.TemplateQueryOptions
+	if params.Lite {
+		opts = append(opts, schema.TemplateQueryOptions{SelectFields: []string{"id", "name"}})
+	}
+	result, err := a.TemplateSrv.Query(ctx, params, opts...)
 	if err != nil {
 		ginx.ResError(c, err)
 		return

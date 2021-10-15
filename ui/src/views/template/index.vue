@@ -258,6 +258,8 @@ export default {
         this.list = response.data.list
         this.total = response.data.pagination.total
         this.loading = false
+      }).catch(err => {
+        this.msgError(err)
       })
     },
     // 岗位状态字典翻译
@@ -317,6 +319,8 @@ export default {
         this.form = response.data
         this.open = true
         this.title = '修改邮件模板'
+      }).catch(err => {
+        this.msgError(err)
       })
     },
     /** 提交按钮 */

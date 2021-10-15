@@ -24,6 +24,7 @@ type Router struct {
 	TemplateAPI  *api.TemplateAPI
 	RecordAPI    *api.RecordAPI
 	SendBatchAPI *api.SendBatchAPI
+	SettingAPI   *api.SettingAPI
 } // end
 
 // Register 注册路由
@@ -79,6 +80,12 @@ func (a *Router) RegisterAPI(app *gin.Engine) {
 			gSendBatch.GET("current", a.SendBatchAPI.Current)
 			gSendBatch.POST("", a.SendBatchAPI.Create)
 			gSendBatch.DELETE("", a.SendBatchAPI.Cancel)
+		}
+
+		gSetting := v1.Group("settings")
+		{
+			gSetting.GET(":key", a.SettingAPI.Get)
+			gSetting.POST("", a.SettingAPI.Upsert)
 		}
 
 	} // v1 end

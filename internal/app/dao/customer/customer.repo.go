@@ -31,7 +31,9 @@ func (a *CustomerRepo) Query(ctx context.Context, params schema.CustomerQueryPar
 	opt := a.getQueryOption(opts...)
 
 	db := GetCustomerDB(ctx, a.DB)
-	// TODO: 查询条件
+	if len(params.Keyword) > 0 {
+		db.Where("email LIKE %?%", params.Keyword)
+	}
 
 	if len(opt.SelectFields) > 0 {
 		db = db.Select(opt.SelectFields)

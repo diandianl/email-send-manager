@@ -9,7 +9,7 @@ import (
 	"email-send-manager/internal/app/schema"
 )
 
-var SendBatchSet = wire.NewSet(wire.Struct(new(SendBatchSrv), "*"))
+var SendBatchSet = wire.NewSet(wire.Struct(new(SendBatchSrv), "TransRepo", "CustomerRepo", "TemplateRepo"))
 
 type SendBatchSrv struct {
 	current *schema.SendBatch

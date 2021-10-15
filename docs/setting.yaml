@@ -1,0 +1,9 @@
+name: Setting
+comment: 系统配置
+fields:
+  - name: Key
+    type: string
+    comment: 配置Key
+  - name: Value
+    type: string
+    comment: 配置值

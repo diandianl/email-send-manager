@@ -4,22 +4,22 @@ import "time"
 
 // Template 邮件模板管理对象
 type Template struct {
-	ID        uint    `json:"id"`                         // 唯一标识
-	Name      string    `json:"name" binding:"required"`    // 名称
-	From      string    `json:"from" binding:"required"`    // 发件人邮箱
-	FromName  string    `json:"from_name"`                  // 联系人名称
-	ReplyTo   string    `json:"reply_to"`                   // 回复邮箱地址
-	Subject   string    `json:"subject" binding:"required"` // 邮件主题
-	Content   string    `json:"content" binding:"required"` // 邮件正文模板
-	Status    int       `json:"status"`                     // 状态(1:启用 2:禁用)
-	CreatedAt time.Time `json:"created_at"`                 // 创建时间
-	UpdatedAt time.Time `json:"updated_at"`                 // 更新时间
-
+	ID        uint      `json:"id"`                                   // 唯一标识
+	Name      string    `json:"name" binding:"required"`              // 名称
+	From      string    `json:"from,omitempty" binding:"required"`    // 发件人邮箱
+	FromName  string    `json:"from_name,omitempty"`                  // 联系人名称
+	ReplyTo   string    `json:"reply_to,omitempty"`                   // 回复邮箱地址
+	Subject   string    `json:"subject,omitempty" binding:"required"` // 邮件主题
+	Content   string    `json:"content,omitempty" binding:"required"` // 邮件正文模板
+	Status    int       `json:"status,omitempty"`                     // 状态(1:启用 2:禁用)
+	CreatedAt time.Time `json:"created_at,omitempty"`                 // 创建时间
+	UpdatedAt time.Time `json:"updated_at,omitempty"`                 // 更新时间
 }
 
 // TemplateQueryParam 查询条件
 type TemplateQueryParam struct {
 	PaginationParam
+	Lite bool `form:"lite"`
 }
 
 // TemplateQueryOptions 查询可选参数项

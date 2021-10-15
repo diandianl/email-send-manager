@@ -8,7 +8,7 @@
       <el-tab-pane
         v-for="item in visitedViews"
         :key="item.path"
-        :closable="item.fullPath === '/dashboard' ? false : true"
+        :closable="!item.meta || !item.meta.affix"
         :name="item.fullPath"
       >
         <router-link
