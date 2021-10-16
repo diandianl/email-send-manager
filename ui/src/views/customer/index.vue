@@ -274,13 +274,13 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(function() {
-        return delCustomer(row.id)
-      }).then((response) => {
-        this.open = false
-        this.getList()
-      }).catch(err => {
-        this.msgError(err)
-      })
+        delCustomer(row.id).then((response) => {
+          this.open = false
+          this.getList()
+        }).catch(err => {
+          this.msgError(err)
+        })
+      }).catch(() => {})
     },
     handleImportSuccess(response) {
       this.msgInfo('导入成功')

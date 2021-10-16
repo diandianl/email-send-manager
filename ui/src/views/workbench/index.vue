@@ -430,13 +430,13 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(function() {
-        return delRecord(row.id)
-      }).then((response) => {
-        this.open = false
-        this.getList()
-      }).catch(err => {
-        this.msgError(err)
-      })
+        delRecord(row.id).then((response) => {
+          this.open = false
+          this.getList()
+        }).catch(err => {
+          this.msgError(err)
+        })
+      }).catch(() => {})
     },
     handleReSend(row) {
       this.sendBatch = {
