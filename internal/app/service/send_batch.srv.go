@@ -43,7 +43,7 @@ func (a *SendBatchSrv) Current(ctx context.Context) (*schema.SendBatchProgress, 
 		return nil, nil
 	}
 
-	defer a.current.Lock()
+	defer a.current.Unlock()
 	a.current.Lock()
 	logger.Debugf("acquired current lock")
 
@@ -52,13 +52,18 @@ func (a *SendBatchSrv) Current(ctx context.Context) (*schema.SendBatchProgress, 
 		a.current = nil
 	}
 
+	var err string
+	if cur.err != nil {
+		err = cur.err.Error()
+	}
+
 	return &schema.SendBatchProgress {
 		StartAt:      cur.startAt,
 		TemplateName: cur.tpl,
 		Total:        cur.total,
 		Success:      cur.success,
 		Failure:      cur.failure,
-		Error:        cur.err,
+		Error:        err,
 	}, nil
 }
 
@@ -66,7 +71,8 @@ func (a *SendBatchSrv) TerminateCurrent(ctx context.Context) error {
 	defer a.Unlock()
 	a.Lock()
 	if a.current == nil {
-		return errors.New("无运行中的任务")
+		//return errors.New("无运行中的任务")
+		return nil
 	}
 	a.current.Cancel()
 	a.current = nil
@@ -138,7 +144,7 @@ func (a *SendBatchSrv) StartSendBatch(ctx context.Context, item schema.SendBatch
 	ctx, cancel := context.WithCancel(context.Background())
 	ch := make(chan *schema.Customer)
 
-	cur := current{cancel: cancel, startAt: time.Now()}
+	cur := current{cancel: cancel, startAt: time.Now(), tpl: tpl.Name, err: errors.New("禁止沙雕使用")}
 
 	cp := customerProvider {
 		ctx:     ctx,

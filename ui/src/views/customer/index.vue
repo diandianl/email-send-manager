@@ -42,7 +42,7 @@
             <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
           </el-col>
           <el-col :span="1.5">
-            <el-button type="warning" icon="el-icon-upload" size="mini" @click="handleImport">导入</el-button>
+            <el-button type="warning" icon="el-icon-upload" size="mini" @click="openImport = true">导入</el-button>
           </el-col>
         </el-row>
 
@@ -110,15 +110,17 @@
           <el-upload
             class="upload-demo"
             drag
-            action="https://jsonplaceholder.typicode.com/posts/"
+            accept=".xls,.xlsx"
+            :action="importUrl"
+            :on-success="handleImportSuccess"
+            :on-error="handleImportFailure"
           >
             <i class="el-icon-upload" />
             <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
             <div slot="tip" class="el-upload__tip">只能上传 Excel 文件，且不超过500kb</div>
           </el-upload>
           <div slot="footer" class="dialog-footer">
-            <el-button @click="dialogFormVisible = false">取 消</el-button>
-            <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+            <el-button @click="openImport = false">关 闭</el-button>
           </div>
         </el-dialog>
       </el-card>
@@ -127,12 +129,13 @@
 </template>
 
 <script>
-import { queryCustomer, getCustomer, updateCustomer, addCustomer, delCustomer } from '@/api/customer'
+import { queryCustomer, getCustomer, updateCustomer, addCustomer, delCustomer, importUrl } from '@/api/customer'
 
 export default {
   name: 'CustomerManage',
   data() {
     return {
+      importUrl: importUrl,
       // 遮罩层
       loading: true,
       // 选中数组
@@ -279,9 +282,12 @@ export default {
         this.msgError(err)
       })
     },
-    /** 导出按钮操作 */
-    handleImport() {
-      this.openImport = true
+    handleImportSuccess(response) {
+      this.msgInfo('导入成功')
+      this.getList()
+    },
+    handleImportFailure(err) {
+      this.msgError(err)
     }
   }
 }

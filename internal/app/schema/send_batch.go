@@ -16,7 +16,7 @@ type SendBatchProgress struct {
 	Total        int32     `json:"total"`
 	Success      int32     `json:"success"`
 	Failure      int32     `json:"failure"`
-	Error        error     `json:"error"`
+	Error        string    `json:"error,omitempty"`
 }
 
 // SendBatchQueryParam 查询条件

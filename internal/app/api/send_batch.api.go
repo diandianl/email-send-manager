@@ -42,6 +42,10 @@ func (a *SendBatchAPI) StartSendBatch(c *gin.Context) {
 }
 
 func (a *SendBatchAPI) Cancel(c *gin.Context) {
-	// TODO
+	err := a.SendBatchSrv.TerminateCurrent(c.Request.Context())
+	if err != nil {
+		ginx.ResError(c, err)
+		return
+	}
 	ginx.ResOK(c)
 }

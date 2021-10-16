@@ -120,18 +120,18 @@
             <el-card v-if="current" class="box-card" :body-style="{ padding: '0' }">
               <div slot="header" class="clearfix">
                 <span>当前任务</span>
-                <el-button style="float: right" type="danger" plain size="small">结束当前任务</el-button>
+                <el-button style="float: right" type="primary" plain size="small" @click="handleCancelSend">结束当前任务</el-button>
               </div>
               <div>
                 <p>开始于: {{ current.start_at }}</p>
                 <div class="tags">
-                  <el-tag size="small">总计(30)</el-tag>
-                  <el-tag size="small" type="success">成功(5)</el-tag>
-                  <el-tag size="small" type="danger">失败(0)</el-tag>
+                  <el-tag size="small">总计({{ current.total }})</el-tag>
+                  <el-tag size="small" type="success">成功({{ current.success }})</el-tag>
+                  <el-tag size="small" type="danger">失败({{ current.failure }})</el-tag>
                 </div>
-                <p><span v-show="current.error">任务失败: {{ current.error }}</span></p>
+                <p><el-tag v-if="current.error" type="danger">任务失败: {{ current.error }}</el-tag></p>
               </div>
-              <el-progress :percentage="50" />
+              <el-progress :percentage="current.percentage" />
             </el-card>
           </el-col>
         </el-row>
@@ -215,7 +215,7 @@ import { querySettings, upsertSettings } from '@/api/setting'
 import { queryRecord, delRecord } from '@/api/record'
 import { queryTemplate } from '@/api/template'
 import { queryCustomer } from '@/api/customer'
-import { queryCurrent, doSendBatch } from '@/api/send-batch'
+import { queryCurrent, doSendBatch, cancelSend } from '@/api/send-batch'
 
 export default {
   name: 'SendManage',
@@ -291,7 +291,7 @@ export default {
     },
     loadCurrentTask() {
       queryCurrent().then(response => {
-        let cur = response.data
+        const cur = response.data
         if (cur && cur.total > 0) {
           cur.percentage = ((cur.success + cur.failure) / cur.total) * 100
         }
@@ -382,7 +382,8 @@ export default {
       this.$refs['sending'].validate(valid => {
         if (valid) {
           doSendBatch(this.sendBatch).then(response => {
-            this.openSetting = false
+            this.openSending = false
+            this.loadCurrentTask()
           }).catch(err => {
             this.msgError(err)
           })
@@ -416,6 +417,27 @@ export default {
       }).catch(err => {
         this.msgError(err)
       })
+    },
+    handleCancelSend() {
+      if (!this.current.error) {
+        this.$confirm('当前发送任务还未完成，是否确定取消?', '警告', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          return cancelSend()
+        }).then(response => {
+          this.loadCurrentTask()
+        }).catch(err => {
+          this.msgError(err)
+        })
+      } else {
+        cancelSend().then(response => {
+          this.loadCurrentTask()
+        }).catch(err => {
+          this.msgError(err)
+        })
+      }
     }
   }
 }

@@ -43,3 +43,4 @@ export function delCustomer(customerId) {
   })
 }
 
+export const importUrl = process.env.VUE_APP_BASE_API + '/api/v1/customers/import'

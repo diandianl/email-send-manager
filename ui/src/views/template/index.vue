@@ -36,7 +36,11 @@
 
         <el-table v-loading="loading" :data="list" border>
           <el-table-column label="名称" align="center" prop="name" />
-          <el-table-column label="主题" align="center" prop="subject" />
+          <el-table-column label="主题">
+            <template slot-scope="scope">
+              <div v-for="(subject, index) in scope.row.subject.split('_::_')" :key="index">{{ index }}: {{ subject }}</div>
+            </template>
+          </el-table-column>
           <el-table-column label="发件人邮箱" align="center" prop="from" />
           <el-table-column label="发件人名称" align="center" prop="from_name" />
           <el-table-column label="回复邮箱" align="center" prop="reply_to" />
@@ -87,52 +91,65 @@
 
         <!-- 添加或修改岗位对话框 -->
         <el-dialog :title="title" :visible.sync="open">
-          <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+          <el-form ref="form" :model="form" :rules="rules" label-width="100px">
             <el-row :gutter="5">
               <el-col :span="10">
-                <el-form-item label="模板名称" label-width="85px" prop="name">
+                <el-form-item label="模板名称" prop="name">
                   <el-input v-model="form.name" placeholder="请输入模板名称" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="10" :offset="2">
-                <el-form-item label="邮件主题" label-width="85px" prop="subject">
-                  <el-input v-model="form.subject" placeholder="请输入邮件主题" />
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row :gutter="5">
               <el-col :span="10">
-                <el-form-item label="发件人邮箱" label-width="85px" prop="from">
+                <el-form-item label="发件人邮箱" prop="from">
                   <el-input v-model="form.from" placeholder="请输入发件人邮箱" />
                 </el-form-item>
               </el-col>
               <el-col :span="10" :offset="2">
-                <el-form-item label="发件人名称" label-width="85px" prop="from_name">
+                <el-form-item label="发件人名称" prop="from_name">
                   <el-input v-model="form.from_name" placeholder="请输入发件人名称" />
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row :gutter="5">
               <el-col :span="10">
-                <el-form-item label="回复邮箱" label-width="85px" prop="reply_to">
+                <el-form-item label="回复邮箱" prop="reply_to">
                   <el-input v-model="form.reply_to" placeholder="请输入回复邮箱" />
                 </el-form-item>
               </el-col>
               <el-col :span="10" :offset="2">
-                <el-form-item label="状态" prop="status" label-width="85px">
+                <el-form-item label="状态" prop="status">
                   <el-switch v-model="form.status" :active-value="1" active-text="启用" :inactive-value="0" inactive-text="禁用" />
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-row :gutter="5" style="height: 20rem">
+            <el-row v-for="(subject, index) in form.subjects" :key="index" :gutter="10">
+              <el-col :span="10">
+                <el-form-item
+                  :label="'主题' + index"
+                  :prop="'subjects.' + index"
+                  :rules="{required: true, message: '主题不能为空', trigger: 'blur'}"
+                >
+                  <el-input v-model="form.subjects[index]" placeholder="请输入邮件主题" />
+                </el-form-item>
+              </el-col>
+              <el-col v-if="form.subjects.length > 1" :span="2">
+                <el-button style="margin-top: 6px;" type="danger" icon="el-icon-delete" size="mini" circle @click.prevent="removeSubject(index)" />
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-button style="margin-left: 100px; margin-bottom: 15px" @click="addSubject">新增主题</el-button>
+            </el-row>
+            <el-row :gutter="5">
               <el-col>
-                <el-divider content-position="left">邮件正文模板</el-divider>
-                <quill-editor
-                  v-model="form.content"
-                  class="editor"
-                  style="height: 100%"
-                  :options="editorOption"
-                />
+                <el-form-item label="邮件正文" prop="content">
+                  <quill-editor
+                    v-model="form.content"
+                    class="editor"
+                    style="height: 280px;margin-bottom: 45px;"
+                    :options="editorOption"
+                  />
+                </el-form-item>
               </el-col>
             </el-row>
           </el-form>
@@ -150,7 +167,7 @@
 </template>
 
 <script>
-import { queryTemplate, getTemplate, updateTemplate, addTemplate, delTemplate } from '@/api/template'
+import { addTemplate, delTemplate, getTemplate, queryTemplate, updateTemplate } from '@/api/template'
 
 import Quill from 'quill'
 import 'quill/dist/quill.core.css'
@@ -158,10 +175,10 @@ import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
 import { ImageDrop } from 'quill-image-drop-module'
 import ImageResize from 'quill-image-resize-module'
+import { quillEditor } from 'vue-quill-editor'
+
 Quill.register('modules/imageDrop', ImageDrop)
 Quill.register('modules/imageResize', ImageResize)
-
-import { quillEditor } from 'vue-quill-editor'
 
 export default {
   name: 'TemplateManage',
@@ -231,18 +248,20 @@ export default {
         pageIndex: 1,
         pageSize: 10,
         name: undefined,
-        email: undefined,
         status: undefined
       },
       // 表单参数
-      form: {},
+      form: { subjects: [''] },
       // 表单校验
       rules: {
         name: [
-          { required: true, message: '客户名称不能为空', trigger: 'blur' }
+          { required: true, message: '模板名称不能为空', trigger: 'blur' }
         ],
-        email: [
-          { required: true, message: '客户邮箱不能为空', trigger: 'blur' }
+        from: [
+          { required: true, message: '发件人不能为空', trigger: 'blur' }
+        ],
+        content: [
+          { required: true, message: '邮件正文不能为空', trigger: 'blur' }
         ]
       }
     }
@@ -281,7 +300,8 @@ export default {
         from_name: undefined,
         reply_to: undefined,
         content: undefined,
-        status: 1
+        status: 1,
+        subjects: ['']
       }
       this.resetForm('form')
     },
@@ -327,16 +347,19 @@ export default {
     submitForm: function() {
       this.$refs['form'].validate(valid => {
         if (valid) {
-          this.form.status = parseInt(this.form.status)
-          if (this.form.id !== undefined) {
-            updateTemplate(this.form, this.form.id).then(response => {
+          const data = Object.assign(this.form, {})
+          data.subject = data.subjects.join('_::_')
+          delete data.subjects
+
+          if (data.id !== undefined) {
+            updateTemplate(data, data.id).then(response => {
               this.open = false
               this.getList()
             }).catch(err => {
               this.msgError(err)
             })
           } else {
-            addTemplate(this.form).then(response => {
+            addTemplate(data).then(response => {
               this.open = false
               this.getList()
             }).catch(err => {
@@ -360,6 +383,12 @@ export default {
       }).catch(err => {
         this.msgError(err)
       })
+    },
+    addSubject() {
+      this.form.subjects.push('')
+    },
+    removeSubject(idx) {
+      this.form.subjects.splice(idx, 1)
     }
   }
 }
