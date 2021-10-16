@@ -6,9 +6,9 @@ import "time"
 type Record struct {
 	ID         uint      `json:"id"`          // 唯一标识
 	TemplateID uint      `json:"template_id"` // 模板ID
-	Template   Template  `json:"template"`
+	Template   *Template `json:"template"`
 	CustomerID uint      `json:"customer_id"` // 客户ID
-	Customer   Customer  `json:"customer"`
+	Customer   *Customer `json:"customer"`
 	Status     int       `json:"status"`     // 结果状态(0:成功 1:失败)
 	Reason     string    `json:"reason"`     // 失败原因
 	CreatedAt  time.Time `json:"created_at"` // 创建时间

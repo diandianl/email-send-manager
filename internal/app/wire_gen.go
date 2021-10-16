@@ -57,16 +57,18 @@ func BuildInjector() (*Injector, func(), error) {
 	recordAPI := &api.RecordAPI{
 		RecordSrv: recordSrv,
 	}
+	settingRepo := &setting.SettingRepo{
+		DB: db,
+	}
 	sendBatchSrv := &service.SendBatchSrv{
 		TransRepo:    trans,
 		CustomerRepo: customerRepo,
 		TemplateRepo: templateRepo,
+		SettingRepo:  settingRepo,
+		RecordRepo:   recordRepo,
 	}
 	sendBatchAPI := &api.SendBatchAPI{
 		SendBatchSrv: sendBatchSrv,
-	}
-	settingRepo := &setting.SettingRepo{
-		DB: db,
 	}
 	settingSrv := &service.SettingSrv{
 		TransRepo:   trans,

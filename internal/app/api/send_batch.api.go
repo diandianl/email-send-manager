@@ -17,7 +17,7 @@ type SendBatchAPI struct {
 
 func (a *SendBatchAPI) Current(c *gin.Context) {
 	ctx := c.Request.Context()
-	item, err := a.SendBatchSrv.Current(ctx, ginx.ParseParamID(c, "id"))
+	item, err := a.SendBatchSrv.Current(ctx)
 	if err != nil {
 		ginx.ResError(c, err)
 		return
@@ -25,7 +25,7 @@ func (a *SendBatchAPI) Current(c *gin.Context) {
 	ginx.ResSuccess(c, item)
 }
 
-func (a *SendBatchAPI) Create(c *gin.Context) {
+func (a *SendBatchAPI) StartSendBatch(c *gin.Context) {
 	ctx := c.Request.Context()
 	var item schema.SendBatch
 	if err := ginx.ParseJSON(c, &item); err != nil {
@@ -33,7 +33,7 @@ func (a *SendBatchAPI) Create(c *gin.Context) {
 		return
 	}
 
-	result, err := a.SendBatchSrv.Create(ctx, item)
+	result, err := a.SendBatchSrv.StartSendBatch(ctx, item)
 	if err != nil {
 		ginx.ResError(c, err)
 		return

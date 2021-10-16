@@ -78,7 +78,7 @@ func (a *Router) RegisterAPI(app *gin.Engine) {
 		gSendBatch := v1.Group("send-batches")
 		{
 			gSendBatch.GET("current", a.SendBatchAPI.Current)
-			gSendBatch.POST("", a.SendBatchAPI.Create)
+			gSendBatch.POST("", a.SendBatchAPI.StartSendBatch)
 			gSendBatch.DELETE("", a.SendBatchAPI.Cancel)
 		}
 

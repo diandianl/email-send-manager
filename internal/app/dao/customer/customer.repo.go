@@ -34,6 +34,13 @@ func (a *CustomerRepo) Query(ctx context.Context, params schema.CustomerQueryPar
 	if len(params.Keyword) > 0 {
 		db.Where("email LIKE %?%", params.Keyword)
 	}
+	if len(params.IDs) > 0 {
+		if params.Include {
+			db.Where("id in ?", params.IDs)
+		} else {
+			db.Where("id not in ?", params.IDs)
+		}
+	}
 
 	if len(opt.SelectFields) > 0 {
 		db = db.Select(opt.SelectFields)

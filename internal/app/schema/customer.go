@@ -16,6 +16,8 @@ type Customer struct {
 type CustomerQueryParam struct {
 	PaginationParam
 	Keyword string `from:"keyword"`
+	IDs     []uint `from:"-"`
+	Include bool   `from:"-"`
 }
 
 // CustomerQueryOptions 查询可选参数项
