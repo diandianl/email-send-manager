@@ -7,7 +7,7 @@
             <el-card shadow="always">
               <el-button type="text" style="padding-left: 15px;" @click="handleSendBatch">
                 <el-card class="box-card" style="background-color: #9fe27e;align-items: center;" shadow="always" align="center">
-                  <i class="el-icon-position" style="font-size: 32px;margin-right: 10px;" />
+                  <i class="el-icon-s-promotion" style="font-size: 32px;margin-right: 10px;" />
                   <span style="font-size: 24px;">发邮件</span>
                 </el-card>
               </el-button>
@@ -77,7 +77,7 @@
                   <el-table-column label="状态" align="center">
                     <template slot-scope="scope">
                       <el-popover
-                        v-if="scope.row.status === 0"
+                        v-if="scope.row.status === 2"
                         placement="top-start"
                         title="失败原因"
                         width="200"
@@ -96,6 +96,13 @@
                   </el-table-column>
                   <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
                     <template slot-scope="scope">
+                      <el-button
+                        v-if="scope.row.status === 2"
+                        size="mini"
+                        type="text"
+                        icon="el-icon-s-promotion"
+                        @click="handleReSend(scope.row)"
+                      >重发</el-button>
                       <el-button
                         size="mini"
                         type="text"
@@ -238,7 +245,7 @@ export default {
       // 总条数
       openSetting: false,
       cfg: {},
-      statusOptions: [{ label: '成功', value: 1 }, { label: '失败', value: 0 }],
+      statusOptions: [{ label: '成功', value: 1 }, { label: '失败', value: 2 }],
       // 表单校验
       rules: {
         host: [
@@ -292,8 +299,21 @@ export default {
     loadCurrentTask() {
       queryCurrent().then(response => {
         const cur = response.data
-        if (cur && cur.total > 0) {
-          cur.percentage = ((cur.success + cur.failure) / cur.total) * 100
+        if (cur) {
+          if (cur.total > 0) {
+            cur.percentage = ((cur.success + cur.failure) / cur.total) * 100
+          } else {
+            cur.percentage = 0
+          }
+          if (!cur.error) {
+            setTimeout(() => {
+              this.loadCurrentTask()
+            }, 2000)
+          }
+          const last = this.current && this.current.success || 0
+          if ((cur.success - last) > 5) {
+            this.getList()
+          }
         }
         this.current = cur
       }).catch(err => {
@@ -398,7 +418,7 @@ export default {
     resetSend() {
       this.sendBatch = {
         template_id: undefined,
-        reverse_selection: undefined,
+        include: undefined,
         customer_ids: []
       }
       this.resetForm('sending')
@@ -417,6 +437,18 @@ export default {
       }).catch(err => {
         this.msgError(err)
       })
+    },
+    handleReSend(row) {
+      this.sendBatch = {
+        template_id: row.template_id,
+        include: true,
+        customer_ids: [row.customer_id]
+      }
+      const cs = this.customers || []
+      if (!cs.find(c => c.id === row.customer_id)) {
+        cs.push({ id: row.customer.id, email: row.customer.email })
+      }
+      this.handleSendBatch()
     },
     handleCancelSend() {
       if (!this.current.error) {

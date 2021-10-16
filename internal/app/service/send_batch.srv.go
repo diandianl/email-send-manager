@@ -9,6 +9,8 @@ import (
 	"gopkg.in/gomail.v2"
 	gotempalte "html/template"
 	"io"
+	"math/rand"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -38,14 +40,12 @@ type SendBatchSrv struct {
 func (a *SendBatchSrv) Current(ctx context.Context) (*schema.SendBatchProgress, error) {
 	defer a.Unlock()
 	a.Lock()
-	logger.Debugf("acquired svc lock")
 	if a.current == nil {
 		return nil, nil
 	}
 
 	defer a.current.Unlock()
 	a.current.Lock()
-	logger.Debugf("acquired current lock")
 
 	cur := a.current
 	if cur.done {
@@ -144,7 +144,7 @@ func (a *SendBatchSrv) StartSendBatch(ctx context.Context, item schema.SendBatch
 	ctx, cancel := context.WithCancel(context.Background())
 	ch := make(chan *schema.Customer)
 
-	cur := current{cancel: cancel, startAt: time.Now(), tpl: tpl.Name, err: errors.New("禁止沙雕使用")}
+	cur := current{cancel: cancel, startAt: time.Now(), tpl: tpl.Name}
 
 	cp := customerProvider {
 		ctx:     ctx,
@@ -157,6 +157,7 @@ func (a *SendBatchSrv) StartSendBatch(ctx context.Context, item schema.SendBatch
 	t := task {
 		ctx:                     ctx,
 		tpl:                     tpl,
+		subjects:                strings.Split(tpl.Subject, "_::_"),
 		current:                 &cur,
 		customers:               ch,
 		sender:                  sender,
@@ -252,20 +253,23 @@ func (p *customerProvider) start() {
 
 	defer close(p.ch)
 
+	pageSize := 100
+
 	params := schema.CustomerQueryParam {
-		PaginationParam: schema.PaginationParam{PageSize: 100, Pagination: true},
+		PaginationParam: schema.PaginationParam{PageSize: pageSize, Pagination: true},
 		IDs:             p.batch.CustomerIDs,
 		Include:         p.batch.Include,
 	}
 
 	for {
 		params.Current += 1
+
+		logger.Debugf("query customers with params: %v", params)
+
 		ret, err := p.repo.Query(p.ctx, params)
 
 		if err != nil {
-			p.current.Lock()
-			p.current.err = err
-			p.current.Unlock()
+			p.current.StopOnError(err)
 			return
 		}
 
@@ -281,28 +285,25 @@ func (p *customerProvider) start() {
 			}
 		}
 
-		if len(ret.Data) < 100 {
+		if len(ret.Data) < pageSize {
 			break
 		}
 	}
 }
 
 type task struct {
-	ctx context.Context
+	ctx                     context.Context
 
-	tpl *schema.Template
+	tpl                     *schema.Template
+	subjects                []string
 
-	current *current
-	customers <- chan *schema.Customer
-
-	sender gomail.SendCloser
-	templateEngine *gotempalte.Template
-
-	RecordRepo   *dao.RecordRepo
-
+	current                 *current
+	customers               <-chan *schema.Customer
+	sender                  gomail.SendCloser
+	templateEngine          *gotempalte.Template
+	RecordRepo              *dao.RecordRepo
 	consecutiveSendFailures int
-
-	interval int64
+	interval                int64
 }
 
 func (s *task) start()  {
@@ -310,8 +311,8 @@ func (s *task) start()  {
 	defer s.sender.Close()
 	for {
 		select {
-		case customer, done := <- s.customers:
-			if done {
+		case customer, ok := <- s.customers:
+			if !ok {
 				s.current.Done()
 				return
 			}
@@ -324,20 +325,23 @@ func (s *task) start()  {
 				time.Sleep(time.Millisecond * time.Duration(s.interval))
 			}
 		case <- s.ctx.Done():
+			logger.Infof("task cancel")
 			return
 		}
 	}
 }
 
 func (s *task) sendTo(customer *schema.Customer) error {
+	logger.Debugf("prepare sending email to %s(%s)", customer.Name, customer.Email)
 	m := gomail.NewMessage()
 
 	m.SetHeader("From", s.tpl.From)
 	m.SetHeader("To", customer.Email)
-	m.SetHeader("Subject", s.tpl.Subject)
+	m.SetHeader("Subject", s.nextSubject())
 
 	data := map[string]string {
 		"CustomerName": customer.Name,
+		"Date": time.Now().Format("2006-01-02"),
 	}
 
 	m.AddAlternativeWriter("text/html", func(w io.Writer) error {
@@ -351,10 +355,13 @@ func (s *task) sendTo(customer *schema.Customer) error {
 	}
 
 	if err := gomail.Send(s.sender, m); err != nil {
+		logger.Errorf("failure sent email: %s", err)
 		record.Reason = err.Error()
+		record.Status = 2
 		s.current.Failure()
 		s.consecutiveSendFailures += 1
 	} else {
+		logger.Debugf("success sent email")
 		s.current.Success()
 		s.consecutiveSendFailures = 0
 	}
@@ -364,4 +371,12 @@ func (s *task) sendTo(customer *schema.Customer) error {
 	}
 
 	return s.RecordRepo.Create(s.ctx, record)
+}
+
+func (s *task) nextSubject() string {
+	length := len(s.subjects)
+	if length == 1 {
+		return s.subjects[0]
+	}
+	return s.subjects[rand.Intn(length)]
 }

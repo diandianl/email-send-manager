@@ -2,6 +2,7 @@ package template
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/wire"
 	"gorm.io/gorm"
@@ -30,7 +31,12 @@ func (a *TemplateRepo) Query(ctx context.Context, params schema.TemplateQueryPar
 	opt := a.getQueryOption(opts...)
 
 	db := GetTemplateDB(ctx, a.DB)
-	// TODO: 查询条件
+	if params.Status > 0 {
+		db.Where("status = ?", params.Status)
+	}
+	if len(params.Name) > 0 {
+		db.Where("name LIKE ?", fmt.Sprintf("%%%s%%", params.Name))
+	}
 
 	if len(opt.SelectFields) > 0 {
 		db = db.Select(opt.SelectFields)

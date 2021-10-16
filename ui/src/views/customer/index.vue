@@ -5,7 +5,7 @@
         <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
           <el-form-item label="名称" prop="email">
             <el-input
-              v-model="queryParams.name"
+              v-model="queryParams.name_keyword"
               placeholder="请输入客户名称"
               clearable
               size="small"
@@ -14,7 +14,7 @@
           </el-form-item>
           <el-form-item label="邮箱" prop="email">
             <el-input
-              v-model="queryParams.email"
+              v-model="queryParams.keyword"
               placeholder="请输入客户邮箱"
               clearable
               size="small"
@@ -52,9 +52,9 @@
           <el-table-column label="状态" align="center" prop="status">
             <template slot-scope="scope">
               <el-tag
-                :type="scope.row.status === 0 ? 'danger' : 'success'"
+                :type="scope.row.status === 2 ? 'danger' : 'success'"
                 disable-transitions
-              >{{ scope.row.status === 0 ? '禁用' : '启用' }}</el-tag>
+              >{{ scope.row.status === 2 ? '禁用' : '启用' }}</el-tag>
             </template>
           </el-table-column>
           <el-table-column label="创建时间" align="center" prop="created_at" width="180">
@@ -98,7 +98,7 @@
               <el-input v-model="form.email" placeholder="请输入客户邮箱" />
             </el-form-item>
             <el-form-item label="状态" prop="status">
-              <el-switch v-model="form.status" :active-value="1" active-text="启用" :inactive-value="0" inactive-text="禁用" />
+              <el-switch v-model="form.status" :active-value="1" active-text="启用" :inactive-value="2" inactive-text="禁用" />
             </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
@@ -155,13 +155,13 @@ export default {
       // 是否显示导入对话框
       openImport: false,
       // 状态数据字典
-      statusOptions: [{ label: '启用', value: 1 }, { label: '禁用', value: 0 }],
+      statusOptions: [{ label: '启用', value: 1 }, { label: '禁用', value: 2 }],
       // 查询参数
       queryParams: {
         pageIndex: 1,
         pageSize: 10,
-        name: undefined,
-        email: undefined,
+        name_keyword: undefined,
+        keyword: undefined,
         status: undefined
       },
       // 表单参数

@@ -18,6 +18,9 @@ type Record struct {
 // RecordQueryParam 查询条件
 type RecordQueryParam struct {
 	PaginationParam
+	TemplateID uint   `form:"template_id"`
+	Status     int    `form:"status"`
+	Email      string `form:"customer_email"`
 }
 
 // RecordQueryOptions 查询可选参数项

@@ -18,13 +18,13 @@ func InitGinEngine(r router.IRouter) *gin.Engine {
 	prefixes := r.Prefixes()
 
 	// Recover
-	app.Use(middleware.RecoveryMiddleware())
+	//app.Use(middleware.RecoveryMiddleware())
 
 	// Trace ID
-	app.Use(middleware.TraceMiddleware(middleware.AllowPathPrefixNoSkipper(prefixes...)))
+	//app.Use(middleware.TraceMiddleware(middleware.AllowPathPrefixNoSkipper(prefixes...)))
 
 	// Access logger
-	app.Use(middleware.LoggerMiddleware(middleware.AllowPathPrefixNoSkipper(prefixes...)))
+	//app.Use(middleware.LoggerMiddleware(middleware.AllowPathPrefixNoSkipper(prefixes...)))
 
 	// Router register
 	r.Register(app)

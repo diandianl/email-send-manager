@@ -1,8 +1,7 @@
 {
-  "name": "kobh",
-  "version": "2.0.4",
-  "description": "A magical vue admin. An out-of-box UI solution for enterprise applications. Newest development stack of vue. Lots of awesome features",
-  "author": "https://github.com/wenjianzhang",
+  "name": "esm",
+  "version": "0.1.0",
+  "author": "https://github.com/diandianl",
   "license": "MIT",
   "scripts": {
     "dev": "vue-cli-service serve",
@@ -10,10 +9,7 @@
     "build:stage": "vue-cli-service build --mode staging",
     "preview": "node build/index.js --preview",
     "lint": "eslint --ext .js,.vue src",
-    "test:unit": "jest --clearCache && vue-cli-service test:unit",
-    "test:ci": "npm run lint && npm run test:unit",
-    "svgo": "svgo -f src/icons/svg --config=src/icons/svgo.yml",
-    "new": "plop"
+    "svgo": "svgo -f src/icons/svg --config=src/icons/svgo.yml"
   },
   "husky": {
     "hooks": {
@@ -28,33 +24,24 @@
   },
   "keywords": [
     "vue",
-    "admin",
-    "kobh",
-    "kobh-ui",
-    "dashboard",
-    "element-ui",
-    "boilerplate",
-    "admin-template",
-    "management-system"
+    "email",
+    "element-ui"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kobh-team/kobh.git"
+    "url": "git+https://github.com/diandianl/email-send-manager.git"
   },
   "bugs": {
-    "url": "https://github.com/kobh-team/kobh/issues"
+    "url": "https://github.com/diandianl/email-send-manager/issues"
   },
   "dependencies": {
     "@riophae/vue-treeselect": "0.4.0",
     "@tinymce/tinymce-vue": "^3.2.2",
-    "awe-dnd": "^0.3.4",
     "axios": "0.21.1",
     "clipboard": "2.0.6",
     "codemirror": "5.62.0",
     "core-js": "^3.17.2",
     "driver.js": "0.9.8",
-    "dropzone": "5.7.2",
-    "echarts": "4.8.0",
     "element-ui": "2.13.2",
     "file-saver": "2.0.2",
     "fuse.js": "6.4.1",
@@ -86,8 +73,7 @@
     "vue-splitpane": "1.0.6",
     "vuedraggable": "2.24.0",
     "vuex": "3.5.1",
-    "webpack-bundle-analyzer": "^4.4.2",
-    "xlsx": "0.16.5"
+    "webpack-bundle-analyzer": "^4.4.2"
   },
   "devDependencies": {
     "@babel/core": "7.11.1",

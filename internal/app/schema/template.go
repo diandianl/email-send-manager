@@ -19,7 +19,9 @@ type Template struct {
 // TemplateQueryParam 查询条件
 type TemplateQueryParam struct {
 	PaginationParam
-	Lite bool `form:"lite"`
+	Lite   bool   `form:"lite"`
+	Name   string `form:"name"`
+	Status int    `form:"status"`
 }
 
 // TemplateQueryOptions 查询可选参数项

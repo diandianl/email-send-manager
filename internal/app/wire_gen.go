@@ -40,15 +40,16 @@ func BuildInjector() (*Injector, func(), error) {
 	templateRepo := &template.TemplateRepo{
 		DB: db,
 	}
+	recordRepo := &record.RecordRepo{
+		DB: db,
+	}
 	templateSrv := &service.TemplateSrv{
 		TransRepo:    trans,
 		TemplateRepo: templateRepo,
+		RecordRepo:   recordRepo,
 	}
 	templateAPI := &api.TemplateAPI{
 		TemplateSrv: templateSrv,
-	}
-	recordRepo := &record.RecordRepo{
-		DB: db,
 	}
 	recordSrv := &service.RecordSrv{
 		TransRepo:  trans,

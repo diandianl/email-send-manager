@@ -2,6 +2,7 @@ package customer
 
 import (
 	"context"
+	"fmt"
 	"gorm.io/gorm/clause"
 
 	"github.com/google/wire"
@@ -31,8 +32,14 @@ func (a *CustomerRepo) Query(ctx context.Context, params schema.CustomerQueryPar
 	opt := a.getQueryOption(opts...)
 
 	db := GetCustomerDB(ctx, a.DB)
-	if len(params.Keyword) > 0 {
-		db.Where("email LIKE %?%", params.Keyword)
+	if len(params.EmailKeyword) > 0 {
+		db.Where("email LIKE ?", fmt.Sprintf("%%%s%%", params.EmailKeyword))
+	}
+	if len(params.NameKeyword) > 0 {
+		db.Where("name LIKE ?", fmt.Sprintf("%%%s%%", params.NameKeyword))
+	}
+	if params.Status > 0 {
+		db.Where("status = ?", params.Status)
 	}
 	if len(params.IDs) > 0 {
 		if params.Include {

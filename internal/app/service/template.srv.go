@@ -15,6 +15,7 @@ var TemplateSet = wire.NewSet(wire.Struct(new(TemplateSrv), "*"))
 type TemplateSrv struct {
 	TransRepo    *dao.TransRepo
 	TemplateRepo *dao.TemplateRepo
+	RecordRepo   *dao.RecordRepo
 }
 
 func (a *TemplateSrv) Query(ctx context.Context, params schema.TemplateQueryParam, opts ...schema.TemplateQueryOptions) (*schema.TemplateQueryResult, error) {
@@ -73,6 +74,9 @@ func (a *TemplateSrv) Delete(ctx context.Context, id uint) error {
 	}
 
 	return a.TransRepo.Exec(ctx, func(ctx context.Context) error {
+		if err := a.RecordRepo.DeleteByTemplateId(ctx, id); err != nil {
+			return err
+		}
 		return a.TemplateRepo.Delete(ctx, id)
 	})
 }

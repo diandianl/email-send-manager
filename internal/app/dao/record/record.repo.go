@@ -2,9 +2,10 @@ package record
 
 import (
 	"context"
-
+	"fmt"
 	"github.com/google/wire"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"email-send-manager/internal/app/dao/util"
 	"email-send-manager/internal/app/schema"
@@ -30,7 +31,15 @@ func (a *RecordRepo) Query(ctx context.Context, params schema.RecordQueryParam, 
 	opt := a.getQueryOption(opts...)
 
 	db := GetRecordDB(ctx, a.DB)
-	// TODO: 查询条件
+	if params.Status > 0 {
+		db.Where("status = ?", params.Status)
+	}
+	if params.TemplateID > 0 {
+		db.Where("template_id = ?", params.TemplateID)
+	}
+	if len(params.Email) > 0 {
+		db.Where("customer_id in (SELECT id FROM tb_customer WHERE email LIKE ?)", fmt.Sprintf("%%%s%%", params.Email))
+	}
 
 	if len(opt.SelectFields) > 0 {
 		db = db.Select(opt.SelectFields)
@@ -73,7 +82,10 @@ func (a *RecordRepo) Get(ctx context.Context, id uint, opts ...schema.RecordQuer
 
 func (a *RecordRepo) Create(ctx context.Context, item schema.Record) error {
 	eitem := SchemaRecord(item).ToRecord()
-	result := GetRecordDB(ctx, a.DB).Create(eitem)
+	result := GetRecordDB(ctx, a.DB).Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "template_id"}, {Name: "customer_id"}},
+		DoUpdates: clause.AssignmentColumns([]string{"status", "reason"}),
+	}).Create(eitem)
 	return errors.WithStack(result.Error)
 }
 
@@ -85,6 +97,11 @@ func (a *RecordRepo) Update(ctx context.Context, id uint, item schema.Record) er
 
 func (a *RecordRepo) Delete(ctx context.Context, id uint) error {
 	result := GetRecordDB(ctx, a.DB).Where("id=?", id).Delete(Record{})
+	return errors.WithStack(result.Error)
+}
+
+func (a *RecordRepo) DeleteByTemplateId(ctx context.Context, templateId uint) error {
+	result := GetRecordDB(ctx, a.DB).Where("template_id=?", templateId).Delete(Record{})
 	return errors.WithStack(result.Error)
 }
 

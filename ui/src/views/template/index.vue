@@ -47,9 +47,9 @@
           <el-table-column label="状态" align="center" prop="status">
             <template slot-scope="scope">
               <el-tag
-                :type="scope.row.status === 0 ? 'danger' : 'success'"
+                :type="scope.row.status === 2 ? 'danger' : 'success'"
                 disable-transitions
-              >{{ scope.row.status === 0 ? '禁用' : '启用' }}</el-tag>
+              >{{ scope.row.status === 2 ? '禁用' : '启用' }}</el-tag>
             </template>
           </el-table-column>
           <el-table-column label="创建时间" align="center" prop="created_at" width="180">
@@ -119,7 +119,7 @@
               </el-col>
               <el-col :span="10" :offset="2">
                 <el-form-item label="状态" prop="status">
-                  <el-switch v-model="form.status" :active-value="1" active-text="启用" :inactive-value="0" inactive-text="禁用" />
+                  <el-switch v-model="form.status" :active-value="1" active-text="启用" :inactive-value="2" inactive-text="禁用" />
                 </el-form-item>
               </el-col>
             </el-row>
@@ -242,7 +242,7 @@ export default {
       preview: false,
       previewContent: undefined,
       // 状态数据字典
-      statusOptions: [{ label: '启用', value: 1 }, { label: '禁用', value: 0 }],
+      statusOptions: [{ label: '启用', value: 1 }, { label: '禁用', value: 2 }],
       // 查询参数
       queryParams: {
         pageIndex: 1,
@@ -336,7 +336,10 @@ export default {
     handleUpdate(row) {
       this.reset()
       getTemplate(row.id).then(response => {
-        this.form = response.data
+        const tpl = response.data
+        tpl.subjects = tpl.subject.split('_::_')
+        delete tpl.subject
+        this.form = tpl
         this.open = true
         this.title = '修改邮件模板'
       }).catch(err => {
@@ -371,18 +374,18 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      this.$confirm('操作不可恢复，是否确认删除?', '警告', {
+      this.$confirm('删除模板会连带删除发送记录，操作不可恢复，是否确认删除?', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(function() {
-        return delTemplate(row.id)
-      }).then((response) => {
-        this.open = false
-        this.getList()
-      }).catch(err => {
-        this.msgError(err)
-      })
+      }).then(() => {
+        delTemplate(row.id).then((response) => {
+          this.open = false
+          this.getList()
+        }).catch(err => {
+          this.msgError(err)
+        })
+      }).catch(() => {})
     },
     addSubject() {
       this.form.subjects.push('')

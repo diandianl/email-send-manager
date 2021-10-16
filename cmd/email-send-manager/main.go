@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"math/rand"
 	"os"
+	"time"
 
 	"github.com/urfave/cli/v2"
 
@@ -14,6 +16,7 @@ import (
 var VERSION = "1.0.0"
 
 func main() {
+	rand.Seed(time.Now().Unix())
 	ctx := logger.NewTagContext(context.Background(), "__main__")
 
 	app := cli.NewApp()

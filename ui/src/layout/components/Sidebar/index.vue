@@ -1,12 +1,11 @@
 <template>
   <div :class="{'has-logo':showLogo}">
-    <logo v-if="showLogo" :collapse="isCollapse" />
     <el-scrollbar wrap-class="scrollbar-wrapper">
       <el-menu
         :default-active="activeMenu"
         :collapse="isCollapse"
-        :background-color=" $store.state.settings.themeStyle === 'light' ? variables.menuLightBg : variables.menuBg"
-        :text-color="$store.state.settings.themeStyle === 'light' ? 'rgba(0,0,0,.65)' : '#fff'"
+        :background-color="variables.menuBg"
+        :text-color="'#fff'"
         :active-text-color="$store.state.settings.theme"
         :unique-opened="true"
         :collapse-transition="true"
@@ -18,7 +17,6 @@
           :item="route"
           :base-path="route.path"
         />
-
       </el-menu>
     </el-scrollbar>
   </div>
@@ -26,12 +24,11 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import Logo from './Logo'
 import SidebarItem from './SidebarItem'
 import variables from '@/styles/variables.scss'
 
 export default {
-  components: { SidebarItem, Logo },
+  components: { SidebarItem },
   computed: {
     ...mapGetters([
       'sidebarRouters',

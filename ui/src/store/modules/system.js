@@ -1,18 +1,16 @@
-import storage from '@/utils/storage'
 const state = {
-  info: storage.get('app_info')
+  info: { sys_app_name: 'ESM' }
 }
 
 const mutations = {
   SET_INFO: (state, data) => {
     state.info = data
-    storage.set('app_info', data)
   }
 }
 
 const actions = {
-  settingDetail({ commit }) {
-    commit('SET_INFO', { sys_app_name: 'Email Send Manager' })
+  settingDetail({ commit }, info) {
+    commit('SET_INFO', info)
   }
 }
 
