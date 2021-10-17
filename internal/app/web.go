@@ -4,7 +4,10 @@ import (
 	"email-send-manager/internal/app/config"
 	"email-send-manager/internal/app/middleware"
 	"email-send-manager/internal/app/router"
+	"email-send-manager/pkg/static"
 	"github.com/gin-gonic/gin"
+	"io/fs"
+	"net/http"
 )
 
 // InitGinEngine 初始化gin引擎
@@ -12,10 +15,8 @@ func InitGinEngine(r router.IRouter) *gin.Engine {
 	gin.SetMode(config.C.RunMode)
 
 	app := gin.New()
-	app.NoMethod(middleware.NoMethodHandler())
-	app.NoRoute(middleware.NoRouteHandler())
 
-	prefixes := r.Prefixes()
+	//prefixes := r.Prefixes()
 
 	// Recover
 	//app.Use(middleware.RecoveryMiddleware())
@@ -29,10 +30,21 @@ func InitGinEngine(r router.IRouter) *gin.Engine {
 	// Router register
 	r.Register(app)
 
+	fe, _ := fs.Sub(static.Static, "assets")
+
+	app.StaticFS("assets", http.FS(fe))
+
+	app.GET("", func(c *gin.Context) {
+		c.FileFromFS("/", http.FS(fe))
+	})
+
+	app.NoRoute(middleware.IndexHandler(http.FS(fe)))
+	app.NoMethod(middleware.NoMethodHandler())
+
 	// Website
-	if dir := config.C.WWW; dir != "" {
-		app.Use(middleware.WWWMiddleware(dir, middleware.AllowPathPrefixSkipper(prefixes...)))
-	}
+	//if dir := config.C.WWW; dir != "" {
+	//	app.Use(middleware.WWWMiddleware(dir, middleware.AllowPathPrefixSkipper(prefixes...)))
+	//}
 
 	return app
 }

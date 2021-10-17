@@ -4,6 +4,7 @@ import (
 	"email-send-manager/internal/app/ginx"
 	"email-send-manager/pkg/errors"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 // NoMethodHandler 未找到请求方法的处理函数
@@ -17,6 +18,12 @@ func NoMethodHandler() gin.HandlerFunc {
 func NoRouteHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ginx.ResError(c, errors.ErrNotFound)
+	}
+}
+
+func IndexHandler(fs http.FileSystem) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.FileFromFS("/", fs)
 	}
 }
 

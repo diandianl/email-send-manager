@@ -44,8 +44,7 @@ func MustLoad(fpaths ...string) {
 
 // Config 配置参数
 type Config struct {
-	RunMode      string
-	WWW          string
+	RunMode      string `default:"debug"`
 	HTTP         HTTP
 	Log          Log
 	Gorm         Gorm
@@ -59,39 +58,35 @@ func (c *Config) IsDebugMode() bool {
 
 // Log 日志配置参数
 type Log struct {
-	Level         int
-	Format        string
-	Output        string
+	Level         int `default:"4"`
+	Format        string `default:"text"`
+	Output        string `default:"stdout"`
 	OutputFile    string
-	EnableHook    bool
 }
 
 // HTTP http配置参数
 type HTTP struct {
-	Host               string
-	Port               int
-	CertFile           string
-	KeyFile            string
-	ShutdownTimeout    int
-	MaxContentLength   int64
+	Host               string `default:"127.0.0.1"`
+	Port               int `default:"9527"`
+	ShutdownTimeout    int `default:"30"`
 	MaxReqLoggerLength int `default:"1024"`
 	MaxResLoggerLength int
 }
 
 // Gorm gorm配置参数
 type Gorm struct {
-	Debug             bool
-	DBType            string
-	MaxLifetime       int
-	MaxOpenConns      int
-	MaxIdleConns      int
-	TablePrefix       string
-	EnableAutoMigrate bool
+	Debug             bool `default:"false"`
+	DBType            string `default:"sqlite3"`
+	MaxLifetime       int `default:"7200"`
+	MaxOpenConns      int `default:"150"`
+	MaxIdleConns      int `default:"50"`
+	TablePrefix       string `default:"tb_"`
+	EnableAutoMigrate bool `default:"true"`
 }
 
 // Sqlite3 sqlite3配置参数
 type Sqlite3 struct {
-	Path string
+	Path string `default:"sqlite.db"`
 }
 
 // DSN 数据库连接串

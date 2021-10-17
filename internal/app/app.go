@@ -2,11 +2,12 @@ package app
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
 	"net/http"
 	"os"
+	"os/exec"
 	"os/signal"
+	"runtime"
 	"syscall"
 	"time"
 
@@ -16,7 +17,6 @@ import (
 
 type options struct {
 	ConfigFile string
-	WWWDir     string
 	Version    string
 }
 
@@ -27,13 +27,6 @@ type Option func(*options)
 func SetConfigFile(s string) Option {
 	return func(o *options) {
 		o.ConfigFile = s
-	}
-}
-
-// SetWWWDir 设定静态站点目录
-func SetWWWDir(s string) Option {
-	return func(o *options) {
-		o.WWWDir = s
 	}
 }
 
@@ -52,9 +45,6 @@ func Init(ctx context.Context, opts ...Option) (func(), error) {
 	}
 
 	config.MustLoad(o.ConfigFile)
-	if v := o.WWWDir; v != "" {
-		config.C.WWW = v
-	}
 
 	logger.WithContext(ctx).Printf("Start server,#mode %s,#version %s,#pid %d", config.C.RunMode, o.Version, os.Getpid())
 
@@ -94,18 +84,10 @@ func InitHTTPServer(ctx context.Context, handler http.Handler) func() {
 
 	go func() {
 		logger.WithContext(ctx).Printf("HTTP server is running at %s.", addr)
-
-		var err error
-		if cfg.CertFile != "" && cfg.KeyFile != "" {
-			srv.TLSConfig = &tls.Config{MinVersion: tls.VersionTLS12}
-			err = srv.ListenAndServeTLS(cfg.CertFile, cfg.KeyFile)
-		} else {
-			err = srv.ListenAndServe()
-		}
+		err := srv.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
 			panic(err)
 		}
-
 	}()
 
 	return func() {
@@ -119,6 +101,24 @@ func InitHTTPServer(ctx context.Context, handler http.Handler) func() {
 	}
 }
 
+// open opens the specified URL in the default browser of the user.
+func open(url string) error {
+	var cmd string
+	var args []string
+
+	switch runtime.GOOS {
+	case "windows":
+		cmd = "cmd"
+		args = []string{"/c", "start"}
+	case "darwin":
+		cmd = "open"
+	default: // "linux", "freebsd", "openbsd", "netbsd"
+		cmd = "xdg-open"
+	}
+	args = append(args, url)
+	return exec.Command(cmd, args...).Start()
+}
+
 // Run 运行服务
 func Run(ctx context.Context, opts ...Option) error {
 	state := 1
@@ -128,6 +128,8 @@ func Run(ctx context.Context, opts ...Option) error {
 	if err != nil {
 		return err
 	}
+
+	go open(fmt.Sprintf("http://localhost:%d", config.C.HTTP.Port))
 
 EXIT:
 	for {

@@ -2,11 +2,10 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"math/rand"
 	"os"
 	"time"
-
-	"github.com/urfave/cli/v2"
 
 	"email-send-manager/internal/app"
 	"email-send-manager/pkg/logger"
@@ -19,40 +18,19 @@ func main() {
 	rand.Seed(time.Now().Unix())
 	ctx := logger.NewTagContext(context.Background(), "__main__")
 
-	app := cli.NewApp()
-	app.Name = "email-send-manager"
-	app.Version = VERSION
-	app.Usage = "RBAC scaffolding based on GIN + GORM + CASBIN + WIRE."
-	app.Commands = []*cli.Command{
-		newWebCmd(ctx),
+	opts := []app.Option{app.SetVersion(VERSION)}
+
+	if len(os.Args) > 2 {
+		fmt.Printf("Usage: %s [path/to/config.yaml]\n", os.Args[0])
+		os.Exit(1)
 	}
-	err := app.Run(os.Args)
+
+	if len(os.Args) > 1 {
+		opts = append(opts, app.SetConfigFile(os.Args[1]))
+	}
+
+	err := app.Run(ctx, opts...)
 	if err != nil {
 		logger.WithContext(ctx).Errorf(err.Error())
-	}
-}
-
-func newWebCmd(ctx context.Context) *cli.Command {
-	return &cli.Command{
-		Name:  "web",
-		Usage: "Run http server",
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:     "conf",
-				Aliases:  []string{"c"},
-				Usage:    "App configuration file(.json,.yaml,.toml)",
-				Required: true,
-			},
-			&cli.StringFlag{
-				Name:  "www",
-				Usage: "Static site directory",
-			},
-		},
-		Action: func(c *cli.Context) error {
-			return app.Run(ctx,
-				app.SetConfigFile(c.String("conf")),
-				app.SetWWWDir(c.String("www")),
-				app.SetVersion(VERSION))
-		},
 	}
 }

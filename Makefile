@@ -5,7 +5,6 @@ NOW = $(shell date -u '+%Y%m%d%I%M%S')
 RELEASE_VERSION = v1.0.0
 
 APP 			= email-send-manager
-SERVER_BIN  	= ./cmd/${APP}/${APP}
 RELEASE_ROOT 	= release
 RELEASE_SERVER 	= release/${APP}
 GIT_COUNT 		= $(shell git rev-list --all --count)
@@ -15,7 +14,7 @@ RELEASE_TAG     = $(RELEASE_VERSION).$(GIT_COUNT).$(GIT_HASH)
 all: start
 
 build:
-	@go build -ldflags "-w -s -X main.VERSION=$(RELEASE_TAG)" -o $(SERVER_BIN) ./cmd/${APP}
+	@go build -ldflags "-w -s -X main.VERSION=$(RELEASE_TAG)" ./cmd/${APP}
 
 start:
 	@go run -ldflags "-X main.VERSION=$(RELEASE_TAG)" ./cmd/${APP}/main.go web -c ./configs/config.toml

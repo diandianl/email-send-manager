@@ -308,7 +308,7 @@ export default {
           if (!cur.error) {
             setTimeout(() => {
               this.loadCurrentTask()
-            }, 2000)
+            }, 1000)
           }
           const last = this.current && this.current.success || 0
           if ((cur.success - last) > 5) {
