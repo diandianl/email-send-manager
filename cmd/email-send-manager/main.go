@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"email-send-manager/internal/app"
@@ -19,6 +21,11 @@ func main() {
 	ctx := logger.NewTagContext(context.Background(), "__main__")
 
 	opts := []app.Option{app.SetVersion(VERSION)}
+
+	// else dev
+	if strings.HasPrefix(filepath.Base(os.Args[0]), "email-send-manager") {
+		opts = append(opts, app.OpenInBrowser())
+	}
 
 	if len(os.Args) > 2 {
 		fmt.Printf("Usage: %s [path/to/config.yaml]\n", os.Args[0])

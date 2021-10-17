@@ -34,6 +34,10 @@ import Layout from '@/layout'
  */
 export const constantRoutes = [
   {
+    path: '/assets',
+    redirect: '/'
+  },
+  {
     path: '/',
     component: Layout,
     redirect: '/workbench',

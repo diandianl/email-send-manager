@@ -19,7 +19,7 @@ func MustLoad(fpaths ...string) {
 	once.Do(func() {
 		loaders := []multiconfig.Loader{
 			&multiconfig.TagLoader{},
-			&multiconfig.EnvironmentLoader{},
+			&multiconfig.EnvironmentLoader{Prefix: "ESM", CamelCase: true},
 		}
 
 		for _, fpath := range fpaths {

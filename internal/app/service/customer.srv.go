@@ -106,7 +106,7 @@ func (a *CustomerSrv) Import(ctx context.Context, r io.Reader) error {
 			return errors.Errorf("invalid format excel file")
 		}
 		name, email := row[0], row[1]
-		customers = append(customers, &customer.Customer{Name: name, Email: email})
+		customers = append(customers, &customer.Customer{Name: name, Email: email, Status: 1})
 	}
 	return a.CustomerRepo.BatchCreate(ctx, customers)
 }

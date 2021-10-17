@@ -16,8 +16,9 @@ import (
 )
 
 type options struct {
-	ConfigFile string
-	Version    string
+	ConfigFile    string
+	Version       string
+	OpenInBrowser bool
 }
 
 // Option 定义配置项
@@ -34,6 +35,12 @@ func SetConfigFile(s string) Option {
 func SetVersion(s string) Option {
 	return func(o *options) {
 		o.Version = s
+	}
+}
+
+func OpenInBrowser() Option {
+	return func(o *options) {
+		o.OpenInBrowser = true
 	}
 }
 
@@ -62,6 +69,10 @@ func Init(ctx context.Context, opts ...Option) (func(), error) {
 
 	// 初始化HTTP服务
 	httpServerCleanFunc := InitHTTPServer(ctx, injector.Engine)
+
+	if o.OpenInBrowser {
+		go open(fmt.Sprintf("http://localhost:%d", config.C.HTTP.Port))
+	}
 
 	return func() {
 		httpServerCleanFunc()
@@ -121,15 +132,14 @@ func open(url string) error {
 
 // Run 运行服务
 func Run(ctx context.Context, opts ...Option) error {
-	state := 1
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	cleanFunc, err := Init(ctx, opts...)
 	if err != nil {
 		return err
 	}
 
-	go open(fmt.Sprintf("http://localhost:%d", config.C.HTTP.Port))
+	state := 1
+	sc := make(chan os.Signal, 1)
+	signal.Notify(sc, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 
 EXIT:
 	for {

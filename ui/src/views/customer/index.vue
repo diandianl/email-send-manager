@@ -273,8 +273,8 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(function() {
-        delCustomer(row.id).then((response) => {
+      }).then(() => {
+        delCustomer(row.id).then(response => {
           this.open = false
           this.getList()
         }).catch(err => {
@@ -283,7 +283,7 @@ export default {
       }).catch(() => {})
     },
     handleImportSuccess(response) {
-      this.msgInfo('导入成功')
+      this.msgSuccess('导入成功')
       this.getList()
     },
     handleImportFailure(err) {

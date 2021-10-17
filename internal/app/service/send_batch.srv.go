@@ -126,6 +126,10 @@ func (a *SendBatchSrv) StartSendBatch(ctx context.Context, item schema.SendBatch
 		return nil, errors.Errorf("没有找到模板 '%d'", item.TemplateID)
 	}
 
+	if tpl.Status != 1 {
+		return nil, errors.New("该模板处于禁用状态")
+	}
+
 	tempalteEngine, err := gotempalte.New("email-content").Parse(tpl.Content)
 
 	if err != nil {
@@ -259,6 +263,7 @@ func (p *customerProvider) start() {
 		PaginationParam: schema.PaginationParam{PageSize: pageSize, Pagination: true},
 		IDs:             p.batch.CustomerIDs,
 		Include:         p.batch.Include,
+		Status:          1, // 1 for enabled
 	}
 
 	for {

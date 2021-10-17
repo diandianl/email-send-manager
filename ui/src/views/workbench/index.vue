@@ -290,7 +290,7 @@ export default {
       })
     },
     loadTemplates() {
-      queryTemplate({ pageSize: -1, lite: true }).then(response => {
+      queryTemplate({ pageSize: -1, lite: true, status: 1 }).then(response => {
         this.templates = response.data.list
       }).catch(err => {
         this.msgError(err)
@@ -332,7 +332,7 @@ export default {
     findCustomers(keyword) {
       if (keyword !== '') {
         this.loading = true
-        queryCustomer({ keyword, pageSize: 10 }).then(response => {
+        queryCustomer({ keyword, pageSize: 10, status: 1 }).then(response => {
           this.customers = response.data.list
           this.loading = false
         }).catch(err => {
