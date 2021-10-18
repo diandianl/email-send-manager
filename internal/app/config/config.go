@@ -44,7 +44,7 @@ func MustLoad(fpaths ...string) {
 
 // Config 配置参数
 type Config struct {
-	RunMode      string `default:"debug"`
+	RunMode      string `default:"release"`
 	HTTP         HTTP
 	Log          Log
 	Gorm         Gorm

@@ -5,6 +5,8 @@ import (
 	"email-send-manager/internal/app/dao/customer"
 	"github.com/xuri/excelize/v2"
 	"io"
+	"regexp"
+	"strconv"
 
 	"github.com/google/wire"
 
@@ -12,6 +14,12 @@ import (
 	"email-send-manager/internal/app/schema"
 	"email-send-manager/pkg/errors"
 )
+
+var emailRegExp *regexp.Regexp
+
+func init() {
+	emailRegExp = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+}
 
 var CustomerSet = wire.NewSet(wire.Struct(new(CustomerSrv), "*"))
 
@@ -96,17 +104,34 @@ func (a *CustomerSrv) UpdateStatus(ctx context.Context, id uint, status int) err
 func (a *CustomerSrv) Import(ctx context.Context, r io.Reader) error {
 	xlsx, err := excelize.OpenReader(r)
 	if err != nil {
-		return err
+		return errors.Wrap400Response(err, "无法打开文件")
 	}
 	rows, err := xlsx.GetRows("Sheet1")
+	if err != nil {
+		return errors.Wrap400Response(err, "无法打开Sheet1")
+	}
 
 	var customers []*customer.Customer
-	for _, row := range rows {
-		if len(row) < 2 {
-			return errors.Errorf("invalid format excel file")
+	for i, row := range rows {
+		if len(row) < 1 {
+			return errors.New400Response("无效的Excel，需要满足行格式 [email | name | status]（name, status 可选）")
 		}
-		name, email := row[0], row[1]
-		customers = append(customers, &customer.Customer{Name: name, Email: email, Status: 1})
+
+		if !emailRegExp.MatchString(row[0]) {
+			return errors.New400Response("第%d行无效的邮箱格式，'%s'", i + 1, row[0])
+		}
+
+		c := &customer.Customer{Email: row[0]}
+		if len(row) > 1 {
+			c.Name = row[1]
+		}
+		if len(row) > 2 {
+			c.Status, _ = strconv.Atoi(row[2])
+		}
+		if c.Status == 0 {
+			c.Status = 1
+		}
+		customers = append(customers, c)
 	}
 	return a.CustomerRepo.BatchCreate(ctx, customers)
 }

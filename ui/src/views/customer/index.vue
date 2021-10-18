@@ -47,8 +47,8 @@
         </el-row>
 
         <el-table v-loading="loading" :data="list" border>
-          <el-table-column label="名称" align="center" prop="name" />
           <el-table-column label="邮箱" align="center" prop="email" />
+          <el-table-column label="名称" align="center" prop="name" />
           <el-table-column label="状态" align="center" prop="status">
             <template slot-scope="scope">
               <el-tag
@@ -91,11 +91,11 @@
         <!-- 添加或修改岗位对话框 -->
         <el-dialog :title="title" :visible.sync="open" width="500px">
           <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-            <el-form-item label="客户名称" prop="name">
-              <el-input v-model="form.name" placeholder="请输入客户名称" />
-            </el-form-item>
             <el-form-item label="客户邮箱" prop="email">
               <el-input v-model="form.email" placeholder="请输入客户邮箱" />
+            </el-form-item>
+            <el-form-item label="客户名称" prop="name">
+              <el-input v-model="form.name" placeholder="请输入客户名称" />
             </el-form-item>
             <el-form-item label="状态" prop="status">
               <el-switch v-model="form.status" :active-value="1" active-text="启用" :inactive-value="2" inactive-text="禁用" />
@@ -173,11 +173,9 @@ export default {
       },
       // 表单校验
       rules: {
-        name: [
-          { required: true, message: '客户名称不能为空', trigger: 'blur' }
-        ],
         email: [
-          { required: true, message: '客户邮箱不能为空', trigger: 'blur' }
+          { required: true, message: '客户邮箱不能为空', trigger: 'blur' },
+          { type: 'email', message: '请输入有效的邮箱', trigger: ['blur', 'change'] }
         ]
       }
     }
@@ -189,9 +187,9 @@ export default {
     /** 查询岗位列表 */
     getList() {
       this.loading = true
-      queryCustomer(this.queryParams).then(response => {
-        this.list = response.data.list
-        this.total = response.data.pagination.total
+      queryCustomer(this.queryParams).then(data => {
+        this.list = data.list
+        this.total = data.pagination.total
         this.loading = false
       })
     },
@@ -239,8 +237,8 @@ export default {
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset()
-      getCustomer(row.id).then(response => {
-        this.form = response.data
+      getCustomer(row.id).then(data => {
+        this.form = data
         this.open = true
         this.title = '修改客户信息'
       })
@@ -250,18 +248,14 @@ export default {
       this.$refs['form'].validate(valid => {
         if (valid) {
           if (this.form.id !== undefined) {
-            updateCustomer(this.form, this.form.id).then(response => {
+            updateCustomer(this.form, this.form.id).then(data => {
               this.open = false
               this.getList()
-            }).catch(err => {
-              this.msgError(err)
             })
           } else {
-            addCustomer(this.form).then(response => {
+            addCustomer(this.form).then(data => {
               this.open = false
               this.getList()
-            }).catch(err => {
-              this.msgError(err)
             })
           }
         }
@@ -274,13 +268,11 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        delCustomer(row.id).then(response => {
+        delCustomer(row.id).then(data => {
           this.open = false
           this.getList()
-        }).catch(err => {
-          this.msgError(err)
         })
-      }).catch(() => {})
+      })
     },
     handleImportSuccess(response) {
       this.msgSuccess('导入成功')

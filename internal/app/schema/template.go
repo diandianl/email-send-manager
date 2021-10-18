@@ -6,7 +6,7 @@ import "time"
 type Template struct {
 	ID        uint      `json:"id"`                                   // 唯一标识
 	Name      string    `json:"name" binding:"required"`              // 名称
-	From      string    `json:"from,omitempty" binding:"required"`    // 发件人邮箱
+	From      string    `json:"from,omitempty" binding:"email"`       // 发件人邮箱
 	FromName  string    `json:"from_name,omitempty"`                  // 联系人名称
 	ReplyTo   string    `json:"reply_to,omitempty"`                   // 回复邮箱地址
 	Subject   string    `json:"subject,omitempty" binding:"required"` // 邮件主题

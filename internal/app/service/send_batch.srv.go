@@ -90,13 +90,13 @@ type config struct {
 func (a *SendBatchSrv) StartSendBatch(ctx context.Context, item schema.SendBatch) (*schema.IDResult, error) {
 
 	if item.Include && len(item.CustomerIDs) == 0 {
-		return nil, errors.Errorf("正向选择模式，未提供客户Id列表")
+		return nil, errors.New400Response("包含选择模式，但未提供客户Id列表")
 	}
 
 	a.Lock()
 	if a.current != nil && !a.current.done {
 		a.Unlock()
-		return nil, errors.Errorf("当前批次还未处理完")
+		return nil, errors.New400Response("当前批次还未处理完")
 	}
 	a.current = nil
 	a.Unlock()
@@ -106,16 +106,16 @@ func (a *SendBatchSrv) StartSendBatch(ctx context.Context, item schema.SendBatch
 		return nil, err
 	}
 	if setting == nil || setting.Value == nil {
-		return nil, errors.New("请先设置邮件服务器配置")
+		return nil, errors.New500Response("请先设置邮件服务器配置")
 	}
 	data, err := setting.Value.MarshalJSON()
 	if err != nil {
-		return nil, errors.New("无效的邮件服务器配置")
+		return nil, errors.New400Response("无效的邮件服务器配置")
 	}
 
 	cfg := config{}
 	if err = json.Unmarshal(data, &cfg); err != nil {
-		return nil, errors.New("无效的邮件服务器配置")
+		return nil, errors.New400Response("无效的邮件服务器配置")
 	}
 
 	tpl, err := a.TemplateRepo.Get(ctx, item.TemplateID)
@@ -123,17 +123,17 @@ func (a *SendBatchSrv) StartSendBatch(ctx context.Context, item schema.SendBatch
 		return nil, err
 	}
 	if tpl == nil {
-		return nil, errors.Errorf("没有找到模板 '%d'", item.TemplateID)
+		return nil, errors.New400Response("没有找到模板 '%d'", item.TemplateID)
 	}
 
 	if tpl.Status != 1 {
-		return nil, errors.New("该模板处于禁用状态")
+		return nil, errors.New400Response("该模板处于禁用状态")
 	}
 
 	tempalteEngine, err := gotempalte.New("email-content").Parse(tpl.Content)
 
 	if err != nil {
-		return nil, errors.Errorf("模板编译失败 '%d'", item.TemplateID)
+		return nil, errors.New400Response("模板编译失败 '%d'", item.TemplateID)
 	}
 
 	d := gomail.NewDialer(cfg.Host, cfg.Port, cfg.Username, cfg.Password)
@@ -142,7 +142,7 @@ func (a *SendBatchSrv) StartSendBatch(ctx context.Context, item schema.SendBatch
 	sender, err := d.Dial()
 
 	if err != nil {
-		return nil, errors.Errorf("连接邮件服务器异常： %s", err)
+		return nil, errors.New500Response("连接邮件服务器异常： %s", err)
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -173,7 +173,7 @@ func (a *SendBatchSrv) StartSendBatch(ctx context.Context, item schema.SendBatch
 	defer a.Unlock()
 	a.Lock()
 	if a.current != nil {
-		return nil, errors.Errorf("当前批次还未处理完")
+		return nil, errors.New400Response("当前批次还未处理完")
 	}
 
 	go cp.start()

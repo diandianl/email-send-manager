@@ -284,21 +284,19 @@ export default {
     getList() {
       this.loading = true
       queryRecord(this.queryParams).then(response => {
-        this.records = response.data.list
-        this.total = response.data.pagination.total
+        this.records = response.list
+        this.total = response.pagination.total
         this.loading = false
       })
     },
     loadTemplates() {
       queryTemplate({ pageSize: -1, lite: true, status: 1 }).then(response => {
-        this.templates = response.data.list
-      }).catch(err => {
-        this.msgError(err)
+        this.templates = response.list
       })
     },
     loadCurrentTask() {
       queryCurrent().then(response => {
-        const cur = response.data
+        const cur = response
         if (cur) {
           if (cur.total > 0) {
             cur.percentage = ((cur.success + cur.failure) / cur.total) * 100
@@ -316,27 +314,21 @@ export default {
           }
         }
         this.current = cur
-      }).catch(err => {
-        this.msgError(err)
       })
     },
     loadSettings() {
       return querySettings('email_send_setting').then(response => {
-        const email_send_settings = response.data && response.data.value || {}
+        const email_send_settings = response && response.value || {}
         this.cfg = email_send_settings
         return email_send_settings
-      }).catch(err => {
-        this.msgError(err)
       })
     },
     findCustomers(keyword) {
       if (keyword !== '') {
         this.loading = true
         queryCustomer({ keyword, pageSize: 10, status: 1 }).then(response => {
-          this.customers = response.data.list
+          this.customers = response.list
           this.loading = false
-        }).catch(err => {
-          this.msgError(err)
         })
       } else {
         this.customers = []
@@ -362,8 +354,6 @@ export default {
         if (valid) {
           upsertSettings({ key: 'email_send_setting', value: this.cfg }).then(response => {
             this.openSetting = false
-          }).catch(err => {
-            this.msgError(err)
           })
         }
       })
@@ -394,7 +384,7 @@ export default {
             type: 'warning'
           }).then(() => {
             this.handleOpenSetting()
-          }).catch(() => {})
+          })
         }
       })
     },
@@ -404,8 +394,6 @@ export default {
           doSendBatch(this.sendBatch).then(response => {
             this.openSending = false
             this.loadCurrentTask()
-          }).catch(err => {
-            this.msgError(err)
           })
         }
       })
@@ -433,10 +421,8 @@ export default {
         delRecord(row.id).then((response) => {
           this.open = false
           this.getList()
-        }).catch(err => {
-          this.msgError(err)
         })
-      }).catch(() => {})
+      })
     },
     handleReSend(row) {
       this.sendBatch = {
@@ -460,14 +446,10 @@ export default {
           return cancelSend()
         }).then(response => {
           this.loadCurrentTask()
-        }).catch(err => {
-          this.msgError(err)
         })
       } else {
         cancelSend().then(response => {
           this.loadCurrentTask()
-        }).catch(err => {
-          this.msgError(err)
         })
       }
     }

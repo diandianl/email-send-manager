@@ -258,7 +258,8 @@ export default {
           { required: true, message: '模板名称不能为空', trigger: 'blur' }
         ],
         from: [
-          { required: true, message: '发件人不能为空', trigger: 'blur' }
+          { required: true, message: '发件人不能为空', trigger: 'blur' },
+          { type: 'email', message: '请输入有效的邮箱', trigger: ['blur', 'change'] }
         ],
         content: [
           { required: true, message: '邮件正文不能为空', trigger: 'blur' }
@@ -273,12 +274,10 @@ export default {
     /** 查询岗位列表 */
     getList() {
       this.loading = true
-      queryTemplate(this.queryParams).then(response => {
-        this.list = response.data.list
-        this.total = response.data.pagination.total
+      queryTemplate(this.queryParams).then(data => {
+        this.list = data.list
+        this.total = data.pagination.total
         this.loading = false
-      }).catch(err => {
-        this.msgError(err)
       })
     },
     // 岗位状态字典翻译
@@ -335,15 +334,13 @@ export default {
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset()
-      getTemplate(row.id).then(response => {
-        const tpl = response.data
+      getTemplate(row.id).then(data => {
+        const tpl = data
         tpl.subjects = tpl.subject.split('_::_')
         delete tpl.subject
         this.form = tpl
         this.open = true
         this.title = '修改邮件模板'
-      }).catch(err => {
-        this.msgError(err)
       })
     },
     /** 提交按钮 */
@@ -358,15 +355,11 @@ export default {
             updateTemplate(data, data.id).then(response => {
               this.open = false
               this.getList()
-            }).catch(err => {
-              this.msgError(err)
             })
           } else {
             addTemplate(data).then(response => {
               this.open = false
               this.getList()
-            }).catch(err => {
-              this.msgError(err)
             })
           }
         }
@@ -382,10 +375,8 @@ export default {
         delTemplate(row.id).then((response) => {
           this.open = false
           this.getList()
-        }).catch(err => {
-          this.msgError(err)
         })
-      }).catch(() => {})
+      })
     },
     addSubject() {
       this.form.subjects.push('')
